@@ -1,20 +1,22 @@
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<LoggingMiddleware> _logger;
 
-    public LoggingMiddleware(RequestDelegate next)
+    public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // before controller
-        Console.WriteLine($"[IN] {context.Request.Method} {context.Request.Path}");
+        _logger.LogInformation("[IN] {Method} {Path}", 
+            context.Request.Method, context.Request.Path);
 
-        await _next(context); // pass request down the pipeline
+        await _next(context);
 
-        // after controller responds
-        Console.WriteLine($"[OUT] {context.Response.StatusCode}");
+        _logger.LogInformation("[OUT] {StatusCode}", 
+            context.Response.StatusCode);
     }
 }
