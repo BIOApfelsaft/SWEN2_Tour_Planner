@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.Models;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TourController : ControllerBase
