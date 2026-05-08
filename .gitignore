@@ -1,3 +1,4 @@
 .env
 pgpass
 servers.json
+appsettings.json
