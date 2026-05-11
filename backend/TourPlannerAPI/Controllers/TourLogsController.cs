@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.Models;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TourLogsController : ControllerBase
 {
     private readonly ITourLogService _tourLogService;

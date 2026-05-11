@@ -2,3 +2,4 @@
 pgpass
 servers.json
 appsettings.json
+logs/
