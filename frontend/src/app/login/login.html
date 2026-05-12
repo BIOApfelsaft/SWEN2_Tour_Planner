@@ -1,0 +1,51 @@
+<main class="flex-grow flex flex-col lg:flex-row w-full h-full min-h-screen font-inter">
+  <section class="relative flex-none lg:w-1/2 hidden lg:flex flex-col justify-center p-12 bg-primary text-on-primary">
+     <h1 class="text-5xl font-bold">Plan complex routes.<br/>Log every detail.</h1>
+  </section>
+
+  <section class="flex-grow flex items-center justify-center p-6 bg-surface">
+    <div class="w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-8">Welcome Back</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        
+        <div>
+          <label class="block text-xs font-bold uppercase mb-1">Email Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-3 text-outline">mail</span>
+            <input 
+              formControlName="email"
+              type="email" 
+              class="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+              [ngClass]="email?.invalid && email?.touched ? 'border-error' : 'border-outline'"
+              placeholder="explorer@pathfinder.com">
+          </div>
+          <p *ngIf="email?.invalid && email?.touched" class="text-xs text-error mt-1">
+            Please enter a valid email.
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase mb-1">Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-3 text-outline">lock</span>
+            <input 
+              formControlName="password"
+              [type]="passwordVisible ? 'text' : 'password'"
+              class="w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+              [ngClass]="password?.invalid && password?.touched ? 'border-error' : 'border-outline'"
+              placeholder="••••••••">
+            <button type="button" (click)="togglePassword()" class="absolute right-3 top-3 text-outline">
+              <span class="material-symbols-outlined">{{ passwordVisible ? 'visibility' : 'visibility_off' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" 
+          class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold hover:opacity-90 transition-all">
+          Access Dashboard
+        </button>
+      </form>
+    </div>
+  </section>
+</main>
