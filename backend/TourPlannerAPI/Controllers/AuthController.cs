@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
         _logger.LogInformation("Registering new user with username: {Username}", dto.Username);
         var result = await _authService.RegisterAsync(dto);
         if (!result) return BadRequest("Username already exists.");
-        return Ok("Registered successfully.");
+        return Ok(new { message = "Registered successfully." });
     }
 
     [HttpPost("login")]

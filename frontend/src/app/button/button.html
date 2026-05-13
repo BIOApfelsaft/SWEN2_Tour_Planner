@@ -1,0 +1,15 @@
+<button 
+    [type]="type" 
+    [class]="combinedClasses"
+    [disabled]="disabled">
+    
+    @if (label) {
+      {{ label }}
+    } @else {
+      <ng-content></ng-content>
+    }
+    
+    @if (trailingIcon) {
+      <span class="material-symbols-outlined text-[20px]">{{ trailingIcon }}</span>
+    }
+</button>
