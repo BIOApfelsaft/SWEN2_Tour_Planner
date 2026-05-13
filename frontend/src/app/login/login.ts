@@ -3,15 +3,17 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../button/button';
 import { InputComponent } from '../input/input';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
+import { FooterComponent } from '../footer/footer';
+import { HeaderComponent } from '../header/header';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, InputComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, HeaderComponent, FooterComponent],
   templateUrl: './login.html'
 })
-export class Login {
+export class LoginComponent {
   isLoginMode = true;
   loginForm: FormGroup;
   registerForm: FormGroup;
