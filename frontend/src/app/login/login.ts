@@ -1,64 +1,94 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-@Injectable({ providedIn: 'root' })
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ButtonComponent } from '../button/button';
+import { InputComponent } from '../input/input';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent],
+  templateUrl: './login.html'
 })
 export class Login {
+  isLoginMode = true;
   loginForm: FormGroup;
-  passwordVisible = false;
-
-  constructor(private fb: FormBuilder, private http: HttpClient) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+  registerForm: FormGroup;
   
-  apiUrl: string = 'http://localhost:5134/api/auth';
+  apiErrorMessage: string | null = null; 
 
-  async register(data: { username: string; email: string; password: string }) {
-    console.log('Registrierungsdaten:', data);
-    return this.http.post(`${this.apiUrl}/register`, data);
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    this.loginForm = this.fb.group({
+      username: ['', [Validators.required]], 
+      password: ['', [Validators.required]]
+    });
+
+    this.registerForm = this.fb.group({
+      username: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      passwordRepeat: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
   }
 
-  async login(data: { username: string; password: string }) {
-    console.log('Login-Daten:', data);
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, data);
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const passwordRepeat = control.get('passwordRepeat')?.value;
+    if (password && passwordRepeat && password !== passwordRepeat) {
+      control.get('passwordRepeat')?.setErrors({ mismatch: true });
+      return { mismatch: true };
+    }
+    return null;
   }
 
-
-  // Hilfsmethoden für das HTML
-  get email() { return this.loginForm.get('email'); }
-  get password() { return this.loginForm.get('password'); }
-
-  togglePassword() {
-    this.passwordVisible = !this.passwordVisible;
+  setMode(isLogin: boolean) {
+    this.isLoginMode = isLogin;
+    this.apiErrorMessage = null; 
+    this.cdr.detectChanges();
   }
 
-  async onSubmit() {
-    console.log("Submit");
-    if (this.loginForm.valid) {
-      console.log('Login-Daten:', this.loginForm.value);
-      await (await this.register({ username: 'test', email: 'test@test.at', password: 'test123' })).subscribe(response => {
-        console.log('Registrierung erfolgreich:', response);
-      });
-      await (await this.login({ username: 'test', password: 'test123' })).subscribe(response => {
-        console.log('Login erfolgreich, Token:', response.token)
-        ;
-      });
+  onSubmit() {
+    this.apiErrorMessage = null;
+
+    if (this.isLoginMode) {
+      if (this.loginForm.valid) {
+        this.authService.login(this.loginForm.value).subscribe({
+          next: (res) => {
+            this.router.navigate(['/']);
+          },
+          error: (err) => {
+            this.apiErrorMessage = err.error?.message || err.error || 'Login failed. Please check your credentials.';
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        this.loginForm.markAllAsTouched();
+        this.cdr.detectChanges();
+      }
     } else {
-      console.log('Formular ungültig');
-      this.loginForm.markAllAsTouched();
+      if (this.registerForm.valid) {
+        const { passwordRepeat, ...registerData } = this.registerForm.value;
+        
+        this.authService.register(registerData).subscribe({
+          next: (res) => {
+            this.setMode(true);
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.apiErrorMessage = err.error?.message || err.error || 'Registration failed.';
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        this.registerForm.markAllAsTouched();
+        this.cdr.detectChanges();
+      }
     }
   }
 }

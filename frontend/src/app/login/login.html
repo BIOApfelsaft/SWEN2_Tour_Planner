@@ -1,51 +1,142 @@
-<main class="flex-grow flex flex-col lg:flex-row w-full h-full min-h-screen font-inter">
-  <section class="relative flex-none lg:w-1/2 hidden lg:flex flex-col justify-center p-12 bg-primary text-on-primary">
-     <h1 class="text-5xl font-bold">Plan complex routes.<br/>Log every detail.</h1>
+<main class="grow flex flex-col lg:flex-row w-full h-full min-h-screen">
+
+  <!-- Left Side: Image -->
+  <section class="relative flex-none h-64 lg:h-auto lg:w-5/12 xl:w-1/2 flex-col justify-between p-8 lg:p-12 overflow-hidden bg-surface-container-high hidden lg:flex">
+    <div class="absolute inset-0 z-0">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNgBDDAXbQ2kvOLA6cI1oZExpJCyAWBky_47ZofnuZea2ACxOS0t9c0fsZf3RYkNbfCYMTTAXzKVx1AnD39Rw4Ar3Nbh1vf80rIAdnZifq_veqT05MY3Ub55PZjINKgtvNyfuAyw7GcQUw4gWyN_LsjwN_Z1tVCMP_SoH8BGbKO9hMcIp1M8pKvVnanyqa_i-XXW0iLhSJszcsxYx0N3crfj3nmkLM-d7rvnJo3Tdrf5fC5ba9x4Wdr2f6rGQCDFwhef0C-FiI5Lzg" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/40"></div>
+    </div>
+    <div class="relative z-10 flex flex-col gap-sm lg:gap-md mt-auto justify-end">
+      <span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-wider hidden lg:block">Professional Explorer Platform</span>
+      <h1 class="font-display-lg text-display-lg text-on-primary">
+        Plan complex routes.<br/>Log every detail.
+      </h1>
+    </div>
   </section>
 
-  <section class="flex-grow flex items-center justify-center p-6 bg-surface">
-    <div class="w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-8">Welcome Back</h2>
+  <!-- Right Side: Form -->
+  <section class="grow flex flex-col w-full lg:w-7/12 xl:w-1/2 bg-surface">
+    <div class="lg:hidden flex items-center justify-center p-6 border-b border-surface-variant">
+      <span class="material-symbols-outlined text-primary text-2xl mr-2" style="font-variation-settings: 'FILL' 1;">explore</span>
+      <span class="font-title-sm text-title-sm text-primary tracking-tight">Pathfinder</span>
+    </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <div class="grow flex items-center justify-center p-6 lg:p-16">
+      <div class="w-full max-w-md">
         
-        <div>
-          <label class="block text-xs font-bold uppercase mb-1">Email Address</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-3 text-outline">mail</span>
-            <input 
-              formControlName="email"
-              type="email" 
-              class="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-              [ngClass]="email?.invalid && email?.touched ? 'border-error' : 'border-outline'"
-              placeholder="explorer@pathfinder.com">
-          </div>
-          <p *ngIf="email?.invalid && email?.touched" class="text-xs text-error mt-1">
-            Please enter a valid email.
-          </p>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold uppercase mb-1">Password</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-3 text-outline">lock</span>
-            <input 
-              formControlName="password"
-              [type]="passwordVisible ? 'text' : 'password'"
-              class="w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-              [ngClass]="password?.invalid && password?.touched ? 'border-error' : 'border-outline'"
-              placeholder="••••••••">
-            <button type="button" (click)="togglePassword()" class="absolute right-3 top-3 text-outline">
-              <span class="material-symbols-outlined">{{ passwordVisible ? 'visibility' : 'visibility_off' }}</span>
+        <div class="mb-8">
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-6">
+            {{ isLoginMode ? 'Welcome Back' : 'Start Your Journey' }}
+          </h2>
+          <div class="flex border-b border-outline-variant">
+            <button 
+              (click)="setMode(true)"
+              class="flex-1 pb-3 text-center font-title-sm text-title-sm transition-colors"
+              [class]="isLoginMode ? 'border-b-2 border-primary text-primary' : 'border-b-2 border-transparent text-on-surface-variant hover:text-on-surface'">
+              Log In
+            </button>
+            <button 
+              (click)="setMode(false)"
+              class="flex-1 pb-3 text-center font-title-sm text-title-sm transition-colors"
+              [class]="!isLoginMode ? 'border-b-2 border-primary text-primary' : 'border-b-2 border-transparent text-on-surface-variant hover:text-on-surface'">
+              Join Now
             </button>
           </div>
         </div>
 
-        <button type="submit" 
-          class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold hover:opacity-90 transition-all">
-          Access Dashboard
-        </button>
-      </form>
+        <!-- API Error Banner -->
+        @if (apiErrorMessage) {
+          <div class="mb-6 p-4 rounded-lg bg-error-container text-on-error-container flex items-center gap-2">
+            <span class="material-symbols-outlined">error</span>
+            <span class="font-body-sm text-body-sm">{{ apiErrorMessage }}</span>
+          </div>
+        }
+
+        <!-- LOGIN FORMULAR -->
+        @if (isLoginMode) {
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6" novalidate>
+            <app-input 
+              label="Username" 
+              icon="person" 
+              placeholder="Enter your username" 
+              formControlName="username"
+              [control]="loginForm.get('username')"
+              errorMessage="Username is required.">
+            </app-input>
+
+            <app-input 
+              label="Password" 
+              type="password" 
+              icon="lock" 
+              [showForgot]="true"
+              placeholder="Enter your password" 
+              formControlName="password"
+              [control]="loginForm.get('password')"
+              errorMessage="Password is required.">
+            </app-input>
+
+            <div class="pt-2">
+              <app-button type="submit" label="Access Dashboard" variant="primary" trailingIcon="arrow_forward" [disabled]="loginForm.invalid"></app-button>
+            </div>
+          </form>
+        } 
+        <!-- REGISTER FORMULAR -->
+        @else {
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6" novalidate>
+            <app-input 
+              label="Username" 
+              icon="person" 
+              placeholder="Choose a username" 
+              formControlName="username"
+              [control]="registerForm.get('username')"
+              errorMessage="Username is required.">
+            </app-input>
+
+            <app-input 
+              label="Email Address" 
+              type="email" 
+              icon="mail" 
+              placeholder="explorer@pathfinder.com" 
+              formControlName="email"
+              [control]="registerForm.get('email')"
+              errorMessage="Please enter a valid email.">
+            </app-input>
+
+            <app-input 
+              label="Password" 
+              type="password" 
+              icon="lock" 
+              placeholder="Min. 6 characters" 
+              formControlName="password"
+              [control]="registerForm.get('password')"
+              errorMessage="Password must be at least 6 characters.">
+            </app-input>
+
+            <app-input 
+              label="Repeat Password" 
+              type="password" 
+              icon="lock" 
+              placeholder="Confirm your password" 
+              formControlName="passwordRepeat"
+              [control]="registerForm.get('passwordRepeat')"
+              errorMessage="Passwords do not match.">
+            </app-input>
+
+            <div class="pt-2">
+              <app-button type="submit" label="Create Account" variant="primary" trailingIcon="person_add" [disabled]="registerForm.invalid"></app-button>
+            </div>
+          </form>
+        }
+      </div>
     </div>
+
+    <footer class="bg-surface-container-low text-on-surface-variant font-body-sm text-xs w-full py-6 mt-auto border-t border-outline-variant">
+      <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-primary">Pathfinder</span>
+          <span>Pathfinder Tours. For the Professional Explorer.</span>
+        </div>
+      </div>
+    </footer>
   </section>
 </main>
