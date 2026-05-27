@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './sidebar.html',
+  templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
   navItems = [

@@ -1,16 +1,16 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonComponent } from '../button/button';
-import { InputComponent } from '../input/input';
-import { AuthService } from '../services/auth.service';
-import { FooterComponent } from '../footer/footer';
+import { ButtonComponent } from '../../components/button/button.component';
+import { InputComponent } from '../../components/input/input.component';
+import { AuthService } from '../../services/auth.service';
+import { FooterComponent } from '../../components/footer/footer.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [ReactiveFormsModule, ButtonComponent, InputComponent, FooterComponent],
-  templateUrl: './login.html'
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
   isLoginMode = true;

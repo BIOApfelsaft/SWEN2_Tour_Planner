@@ -1,0 +1,49 @@
+<div class="flex flex-col gap-xs w-full">
+    
+    <div class="flex justify-between items-center">
+        @if (label()) {
+            <label class="font-label-caps text-label-caps text-on-surface-variant">{{ label() }}</label>
+        }
+    </div>
+    
+    <div class="relative">
+      
+        @if (icon()) {
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined" [class]="hasError() ? 'text-error' : 'text-outline'">
+                    {{ icon() }}
+                </span>
+            </div>
+        }
+      
+        <input 
+            [type]="isPasswordVisible() ? 'text' : type()"
+            [placeholder]="placeholder()"
+            [value]="value()"
+            (input)="onInput($event)"
+            (blur)="onTouched()"
+            [disabled]="disabled()"
+            [class]="inputClasses()"
+        />
+      
+        @if (type() === 'password') {
+            <button (click)="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface" type="button">
+                <span class="material-symbols-outlined">
+                    {{ isPasswordVisible() ? 'visibility' : 'visibility_off' }}
+                </span>
+            </button>
+        }
+
+        @if (hasError() && type() !== 'password') {
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">
+                    error
+                </span>
+            </div>
+        }
+    </div>
+    
+    @if (hasError()) {
+        <p class="font-body-sm text-body-sm text-error mt-1">{{ errorMessage() }}</p>
+    }
+</div>
