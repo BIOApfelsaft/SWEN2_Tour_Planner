@@ -10,10 +10,12 @@ export interface TourOverview {
     imageUrl: string;
     location: string;
     type: string;
-    comment: string;
+    comment?: string;
     distance: string;
     date: string;
-    dificulty: string;
+    difficulty: string;
+    childfriendly: boolean;
     time: string;
     rating: number;
+    popularity: number;
 }
