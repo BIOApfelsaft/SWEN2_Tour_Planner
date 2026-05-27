@@ -10,7 +10,6 @@ import { DashboardStatistic, TourOverview } from '../../models/dashboard.model';
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
-  // State Management mit Signals (Mock Daten)
   statistics = signal<DashboardStatistic[]>([
     { icon: 'explore', label: 'Total Tours', value: '24' },
     { icon: 'directions_walk', label: 'Distance', value: '342 km' },
