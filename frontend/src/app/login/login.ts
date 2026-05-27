@@ -5,12 +5,11 @@ import { ButtonComponent } from '../button/button';
 import { InputComponent } from '../input/input';
 import { AuthService } from '../services/auth.service';
 import { FooterComponent } from '../footer/footer';
-import { HeaderComponent } from '../header/header';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, HeaderComponent, FooterComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, FooterComponent],
   templateUrl: './login.html'
 })
 export class LoginComponent {
@@ -62,6 +61,7 @@ export class LoginComponent {
       if (this.loginForm.valid) {
         this.authService.login(this.loginForm.value).subscribe({
           next: (res) => {
+            localStorage.setItem('authToken', res.token);
             this.router.navigate(['/']);
           },
           error: (err) => {
