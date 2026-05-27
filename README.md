@@ -56,8 +56,6 @@ docker-compose up -d
 ### 5. Backend Setup and Start
 ```bash
 cd backend/TourPlannerAPI
-dotnet tool install --global dotnet-ef  # If not installed yet
-dotnet ef database update
 dotnet run
 ```
 The Swagger API documentation will be available at http://localhost:5134/swagger.

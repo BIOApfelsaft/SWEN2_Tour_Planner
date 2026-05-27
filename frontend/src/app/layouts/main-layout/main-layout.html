@@ -1,5 +1,9 @@
 <app-header class="sticky top-0 z-10"></app-header>
-<main class="min-h-screen">
-  <router-outlet></router-outlet>
-</main>
+<div class="flex h-screen w-full bg-background">
+  <app-sidebar></app-sidebar>
+
+  <main class="flex-1 overflow-y-auto p-8">
+    <router-outlet></router-outlet>
+  </main>
+</div>
 <app-footer></app-footer>
