@@ -1,7 +1,8 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { StatisticCardComponent } from '../../components/statistic-card/statistic-card.component';
 import { TourCardComponent } from '../../components/tour-card/tour-card.component';
-import { DashboardStatistic, TourOverview } from '../../models/dashboard.model';
+import { DashboardStatistic } from '../../models/stat.model';
+import { Tour } from '../../models/tour.model';
 import { TourService } from '../../services/tour.service';
 import { StatsService } from '../../services/stats.service';
 
@@ -16,7 +17,7 @@ export class DashboardComponent implements OnInit {
   private statsService = inject(StatsService);
 
   statistics = signal<DashboardStatistic[]>([]);
-  plannedTours = signal<TourOverview[]>([]);
+  plannedTours = signal<Tour[]>([]);
   
   ngOnInit(): void {
     this.loadData();
@@ -32,7 +33,7 @@ export class DashboardComponent implements OnInit {
       }
     });
 
-    this.tourService.getPlannedTours().subscribe({
+    this.tourService.getTours().subscribe({
       next: (data) => {
         this.plannedTours.set(data);
       },

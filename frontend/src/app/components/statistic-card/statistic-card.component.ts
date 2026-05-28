@@ -1,6 +1,5 @@
-// src/app/components/statistic-card/statistic-card.component.ts
 import { Component, input } from '@angular/core';
-import { DashboardStatistic } from '../../models/dashboard.model';
+import { DashboardStatistic } from '../../models/stat.model';
 
 @Component({
   selector: 'app-statistic-card',

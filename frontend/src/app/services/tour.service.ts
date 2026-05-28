@@ -1,45 +1,54 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { TourOverview } from '../models/dashboard.model';
+import { Tour } from '../models/tour.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TourService {
-  private mockTours: TourOverview[] = [
+  private mockTours: Tour[] = [
   {
-      id: '1',
+      id: 1,
+      userId: 1,
       title: 'Mont Blanc Circuit',
-      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT2BlJfDjwB42Qzs6Funm_DZcVSaSFOB3qnVs6W9BrrI8bUTMRH54qRDj_mHyzKywA4AXgmHKxvCwszmbabqpD24O4H3WLgz9jyPX6BZFruTm4gY7zyzUiSU4RBb0EaHBN3J4tMOG26F5TGKeYZBeS7ieb1x2SjkHCye_e-dMjcabsdzP9nJ2Oq-unYF-ZOh6ICWldJFji4b_etj1PtugzwhKvR3NNeXYaxrSgFXZutUSpKldj0km14asEZ6FA0ol1C7g7fKOFWmxA',
-      location: 'Chamonix, France',
-      type: 'Hiking',
-      comment: 'A classic alpine trek around the Mont Blanc massif.',
-      distance: '172 km',
-      date: 'Aug 12',
-      difficulty: 'Hard',
-      time: '10 days',
-      rating: 4.8,
-      popularity: 95,
-      childfriendly: false,
+      description: 'A breathtaking trek around the Mont Blanc massif, passing through France, Italy, and Switzerland.',
+      startLocation: 'Chamonix, France',
+      endLocation: 'Chamonix, France',
+      transportType: 'Hiking',
+      distance: 172,
+      estimatedTime: 864000, // 10 days
+      mapImagePath: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT2BlJfDjwB42Qzs6Funm_DZcVSaSFOB3qnVs6W9BrrI8bUTMRH54qRDj_mHyzKywA4AXgmHKxvCwszmbabqpD24O4H3WLgz9jyPX6BZFruTm4gY7zyzUiSU4RBb0EaHBN3J4tMOG26F5TGKeYZBeS7ieb1x2SjkHCye_e-dMjcabsdzP9nJ2Oq-unYF-ZOh6ICWldJFji4b_etj1PtugzwhKvR3NNeXYaxrSgFXZutUSpKldj0km14asEZ6FA0ol1C7g7fKOFWmxA',
+      routeGeoJson: null, // Placeholder for actual GeoJSON data
+      computedPopularityScore: 98,
+      computedChildFriendlyScore: 5,
+      createdAt: '2024-01-15T10:00:00Z',
+      updatedAt: '2024-01-20T12:00:00Z',
     },
     {
-      id: '2',
-      title: 'Slickrock Trail Expedition',
-      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB7ghgfyUx5wuwa7dB57-678faKyJwuIeK_CI-jdL-Z2ruZfcBdvAWTmRa9NyjNOb9rohMcBXQF0WgC-aXMKfjNpouZQLI4kVob9ow9LzYffxXnwQLjVkKd2ygqHW3WZTLGmGTexWvMDvgS-1A0nSs9dF1G9XpQkBgiKoRIXNHkQHTs-0z_2wSiOignqaTcRc0gGhgA3asiIsLUTJfvDZqmRSzf-Tn1P6mHtPB85m5yq-KfQ8Oi7EvXKSXGd9Zdokso6wbF71rtQTrx',
-      location: 'Moab, Utah',
-      type: 'MTB',
-      comment: 'A thrilling mountain biking adventure through the iconic red rock formations.',
-      distance: '17 km',
-      date: 'Sep 04',
-      difficulty: 'Medium',
-      time: '4 hrs',
-      rating: 4.5,
-      popularity: 87,
-      childfriendly: false,
+      id: 2,
+      userId: 2,
+      title: 'Lake District Loop',
+      description: 'A scenic loop through the Lake District in England, featuring stunning lakes, mountains, and charming villages.',
+      startLocation: 'Keswick, UK',
+      endLocation: 'Keswick, UK',
+      transportType: 'Hiking',
+      distance: 130,
+      estimatedTime: 432000, // 5 days
+      mapImagePath: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT2BlJfDjwB42Qzs6Funm_DZcVSaSFOB3qnVs6W9BrrI8bUTMRH54qRDj_mHyzKywA4AXgmHKxvCwszmbabqpD24O4H3WLgz9jyPX6BZFruTm4gY7zyzUiSU4RBb0EaHBN3J4tMOG26F5TGKeYZBeS7ieb1x2SjkHCye_e-dMjcabsdzP9nJ2Oq-unYF-ZOh6ICWldJFji4b_etj1PtugzwhKvR3NNeXYaxrSgFXZutUSpKldj0km14asEZ6FA0ol1C7g7fKOFWmxA',
+      routeGeoJson: null, // Placeholder for actual GeoJSON data
+      computedPopularityScore: 40,
+      computedChildFriendlyScore: 66,
+      createdAt: '2024-02-10T09:30:00Z',
+      updatedAt: '2024-02-15T11:45:00Z',
     }
   ];
 
-  getPlannedTours(): Observable<TourOverview[]> {
+  getTours(): Observable<Tour[]> {
     return of(this.mockTours).pipe(delay(500));
+  }
+
+  getTourById(id: number): Observable<Tour | undefined> {
+    const tour = this.mockTours.find(t => t.id === id);
+    return of(tour).pipe(delay(300));
   }
 }
