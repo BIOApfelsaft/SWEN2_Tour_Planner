@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, effect, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Tour } from '../../models/tour.model';
 import { TourLog } from '../../models/tour-log.model';
@@ -6,6 +6,7 @@ import { DecimalPipe } from '@angular/common';
 import { TourService } from '../../services/tour.service';
 import { TourLogService } from '../../services/tour-log.service';
 import { TourLogCardComponent } from '../../components/tour-log-card.component/tour-log-card.component';
+import { MapFacadeService } from '../../services/map-facade.service';
 
 @Component({
   selector: 'app-tour-detail',
@@ -13,15 +14,28 @@ import { TourLogCardComponent } from '../../components/tour-log-card.component/t
   imports: [DecimalPipe, TourLogCardComponent],
   templateUrl: './tour-detail.component.html'
 })
-export class TourDetailComponent implements OnInit {
+export class TourDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private tourService = inject(TourService);
   private tourLogService = inject(TourLogService);
+  private mapFacade = inject(MapFacadeService);
 
   tour = signal<Tour | null>(null);
   logs = signal<TourLog[]>([]);
 
   isLoading = signal<Boolean>(true);
+
+  constructor() {
+    // effect init map when tour data is loaded 
+    effect(() => {
+      if (!this.isLoading() && this.tour()) {
+        setTimeout(() => {
+          this.mapFacade.initMap('leaflet-map');
+          this.mapFacade.drawMockRoute();
+        }, 0);
+      }
+    });
+  }
 
   ngOnInit() {
     const tourId = Number(this.route.snapshot.paramMap.get('id'));
@@ -62,5 +76,9 @@ export class TourDetailComponent implements OnInit {
 
   handleDeleteLog(log: TourLog) {
     console.log('Delete log triggered for:', log.id);
+  }
+
+  ngOnDestroy(): void {
+    this.mapFacade.destroyMap();
   }
 }
