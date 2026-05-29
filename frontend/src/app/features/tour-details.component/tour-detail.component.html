@@ -81,43 +81,18 @@
         </div>
       </div>
 
-      <div class="border-t border-outline-variant/50 pt-lg">
+      <div class="border-t border-outline-variant/50 pt-lg space-y-sm">
         <h2 class="font-headline-md text-headline-md text-on-surface mb-md">Tour Logs</h2>
-        
-        <div class="space-y-sm">
+    
+        <div class="flex flex-col gap-md">
           @for (log of logs(); track log.id) {
-            <div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant hover:shadow-md transition-shadow group">
-              <div class="flex flex-col md:flex-row gap-sm justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center gap-md mb-xs">
-                    <span class="font-title-sm text-on-surface">{{ log.logDateTime | date:'mediumDate' }}</span>
-                    
-                    <span class="text-secondary text-body-sm flex items-center gap-xs bg-surface-container px-2 py-0.5 rounded">
-                      <span class="material-symbols-outlined text-[16px]">cloud</span>
-                      {{ log.temperature }}°C, {{ log.weatherCondition }}
-                    </span>
-                  </div>
-                  <p class="text-on-surface-variant font-body-sm mb-md">"{{ log.comment }}"</p>
-                  
-                  <div class="flex flex-wrap gap-sm text-xs font-bold">
-                    <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-                      <span class="material-symbols-outlined text-[14px] mr-1">speed</span> Difficulty: {{ log.difficulty }}/5
-                    </div>
-                    <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-                      <span class="material-symbols-outlined text-[14px] mr-1">star</span> Rating: {{ log.rating }}/5
-                    </div>
-                    <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-                      <span class="material-symbols-outlined text-[14px] mr-1">route</span> {{ log.totalDistance }} km
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="flex gap-xs justify-end items-start md:opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button class="p-2 text-secondary hover:text-primary hover:bg-primary-container rounded-md transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
-                  <button class="p-2 text-secondary hover:text-error hover:bg-error-container rounded-md transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
-                </div>
-              </div>
-            </div>
+            
+            <app-tour-log-card 
+              [log]="log" 
+              (edit)="handleEditLog($event)" 
+              (delete)="handleDeleteLog($event)">
+            </app-tour-log-card>
+            
           } @empty {
             <p class="text-on-surface-variant text-center py-xl font-body-md">No logging metrics documented yet for this expedition.</p>
           }

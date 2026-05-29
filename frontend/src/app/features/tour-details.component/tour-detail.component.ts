@@ -2,14 +2,15 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Tour } from '../../models/tour.model';
 import { TourLog } from '../../models/tour-log.model';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { TourService } from '../../services/tour.service';
 import { TourLogService } from '../../services/tour-log.service';
+import { TourLogCardComponent } from '../../components/tour-log-card.component/tour-log-card.component';
 
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [DecimalPipe, TourLogCardComponent],
   templateUrl: './tour-detail.component.html'
 })
 export class TourDetailComponent implements OnInit {
@@ -53,5 +54,13 @@ export class TourDetailComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  handleEditLog(log: TourLog) {
+    console.log('Edit log triggered for:', log.id);
+  }
+
+  handleDeleteLog(log: TourLog) {
+    console.log('Delete log triggered for:', log.id);
   }
 }

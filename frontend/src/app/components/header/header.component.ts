@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { LayoutService } from '../../services/layout.service';
 
 @Component({
     selector: 'app-header',
@@ -6,6 +7,9 @@ import { Component } from '@angular/core';
     template: `
         <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
     
+            <button (click)="layoutService.toggleMenu()" class="md:hidden p-2 text-on-surface hover:bg-surface-container rounded-lg transition-colors">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
             <div class="flex items-center">
                 <span class="material-symbols-outlined text-primary text-2xl mr-2" style="font-variation-settings: 'FILL' 1;">explore</span>
                 <span class="font-title-sm text-title-sm text-primary tracking-tight">Pathfinder</span>
@@ -34,4 +38,6 @@ import { Component } from '@angular/core';
         </header>
     `,
 })
-export class HeaderComponent {}
+export class HeaderComponent {
+    layoutService = inject(LayoutService);
+}
