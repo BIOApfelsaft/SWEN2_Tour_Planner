@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     selector: 'app-header',
     imports: [],
     template: `
-        <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40 top-0">
+        <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
     
             <div class="flex items-center">
                 <span class="material-symbols-outlined text-primary text-2xl mr-2" style="font-variation-settings: 'FILL' 1;">explore</span>
