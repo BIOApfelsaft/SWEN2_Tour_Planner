@@ -1,0 +1,108 @@
+<main class="pt-4 pb-20 md:pb-0 min-h-screen flex flex-col w-full">
+  <div class="w-full p-margin flex-1 flex flex-col">
+    
+    @if (isLoading()) {
+      <div class="flex-1 flex items-center justify-center font-body-md text-on-surface-variant">
+        Loading tour details...
+      </div>
+    } @else if (tour(); as currentTour) {
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+        <div>
+          <div class="flex items-center gap-sm mb-xs">
+            <span class="bg-surface-container-high text-on-surface-variant px-2 py-1 rounded text-xs font-label-caps tracking-wider uppercase">
+              {{ currentTour.transportType }}
+            </span>
+            <span class="flex items-center text-secondary text-body-sm">
+              <span class="material-symbols-outlined text-[16px] mr-1">location_on</span> 
+              {{ currentTour.startLocation }} &rarr; {{ currentTour.endLocation }}
+            </span>
+          </div>
+          <h1 class="font-display-lg text-display-lg text-on-surface">{{ currentTour.title }}</h1>
+        </div>
+        <div class="flex gap-sm">
+          <button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-title-sm text-body-sm hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[20px]">edit</span> Edit Tour
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-xl">
+        
+        <div class="lg:col-span-8 flex flex-col gap-lg">
+          
+          <div id="tour-map-container" class="relative w-full h-100 rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100">
+            <div id="tour-map-container" class="relative w-full rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100">
+             
+              <div id="leaflet-map" class="absolute inset-0 w-full h-full z-0"></div>
+            
+              <div class="absolute bottom-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-4 shadow-lg flex gap-md items-center z-10 pointer-events-none"></div>
+            </div>
+            
+            <div class="absolute bottom-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-4 shadow-lg flex gap-md items-center z-10">
+              <div>
+                <div class="text-xs text-secondary uppercase tracking-wider font-bold mb-1">Distance</div>
+                <div class="font-title-sm text-on-surface">{{ currentTour.distance }} km</div>
+              </div>
+              <div class="w-px h-8 bg-outline-variant/50"></div>
+              <div>
+                <div class="text-xs text-secondary uppercase tracking-wider font-bold mb-1">Est. Time</div>
+                <div class="font-title-sm text-on-surface">{{ currentTour.estimatedTime / 3600 | number:'1.0-1' }} hrs</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant">
+            <h2 class="font-headline-md text-headline-md text-on-surface mb-4">About this Route</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">{{ currentTour.description }}</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+              <div [class]="currentTour.computedPopularityScore > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+                   class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
+                <span class="material-symbols-outlined mb-2 text-3xl">trending_up</span>
+                <span class="text-xs uppercase tracking-wider font-bold opacity-80">Popularity</span>
+                <span class="font-title-sm">{{ currentTour.computedPopularityScore | number:'1.0-1' }} / 100</span>
+              </div>
+              
+              <div [class]="currentTour.computedChildFriendlyScore > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+                   class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
+                <span class="material-symbols-outlined mb-2 text-3xl">family_restroom</span>
+                <span class="text-xs uppercase tracking-wider font-bold opacity-80">Child-friendly</span>
+                <span class="font-title-sm">{{ currentTour.computedChildFriendlyScore > 60 ? 'Yes' : 'No' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-lg">
+          <div class="bg-primary text-on-primary rounded-xl p-md shadow-md relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <h3 class="font-headline-md text-headline-md mb-2 relative z-10">Document Your Journey</h3>
+            <p class="text-body-sm opacity-90 mb-6 relative z-10">Keep a detailed record of your ascents, environmental conditions, and personal tracking metrics.</p>
+            <button class="w-full bg-white text-primary font-title-sm py-3 rounded-lg shadow-sm hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs relative z-10">
+              <span class="material-symbols-outlined text-[20px]">add_circle</span> Add New Log
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-outline-variant/50 pt-lg space-y-sm">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-md">Tour Logs</h2>
+    
+        <div class="flex flex-col gap-md">
+          @for (log of logs(); track log.id) {
+            
+            <app-tour-log-card 
+              [log]="log" 
+              (edit)="handleEditLog($event)" 
+              (delete)="handleDeleteLog($event)">
+            </app-tour-log-card>
+            
+          } @empty {
+            <p class="text-on-surface-variant text-center py-xl font-body-md">No logging metrics documented yet for this expedition.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</main>

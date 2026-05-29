@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { DashboardStatistic } from '../models/dashboard.model';
+import { DashboardStatistic } from '../models/stat.model';
 
 @Injectable({
   providedIn: 'root'
