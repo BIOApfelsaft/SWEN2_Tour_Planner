@@ -14,11 +14,17 @@ export class MapFacadeService {
     }
 
     // Init map with a default view (Zermatt, Switzerland)
-    this.map = L.map(containerId).setView([46.0207, 7.7491], 10);
+    this.map = L.map(containerId, {
+      zoomControl: false,
+    }).setView([46.0207, 7.7491], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(this.map);
+
+    L.control.zoom({
+      position: 'bottomright'
     }).addTo(this.map);
   }
 
@@ -60,6 +66,13 @@ export class MapFacadeService {
     if (this.map) {
       this.map.remove();
       this.map = null;
+    }
+  }
+
+  clearRoute(): void {
+    if (this.routeLayer) {
+      this.routeLayer.remove();
+      this.routeLayer = null;
     }
   }
 }

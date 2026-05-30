@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-header',
-    imports: [],
+    imports: [RouterLink],
     template: `
-        <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
+        <header [routerLink]="['/tour-planner']" class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
     
             <button (click)="layoutService.toggleMenu()" class="md:hidden p-2 text-on-surface hover:bg-surface-container rounded-lg transition-colors">
                 <span class="material-symbols-outlined">menu</span>
@@ -40,4 +41,5 @@ import { LayoutService } from '../../services/layout.service';
 })
 export class HeaderComponent {
     layoutService = inject(LayoutService);
+
 }

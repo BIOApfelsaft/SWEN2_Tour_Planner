@@ -1,0 +1,116 @@
+<main class="flex-1 relative bg-surface-container-highest overflow-hidden w-full h-[calc(100vh-64px)]">
+  
+  <div id="planner-map-container" class="absolute inset-0 z-0 bg-surface-container w-full h-full"></div>
+
+  <div class="absolute inset-0 z-10 pointer-events-none p-margin flex flex-col md:flex-row justify-between items-start overflow-y-auto">
+    
+    <aside class="pointer-events-auto w-full md:w-96 bg-surface-container-lowest/95 backdrop-blur-md border border-outline-variant/50 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.1)] p-md flex flex-col gap-md mt-2 md:mt-0">
+      
+      <div class="flex flex-col gap-xs">
+        <h2 class="font-headline-md text-headline-md text-on-surface">Plan Route</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Set your waypoints and transport mode.</p>
+      </div>
+
+      <form [formGroup]="plannerForm" class="flex flex-col gap-md" novalidate>
+        
+        <div class="flex flex-col gap-sm">
+          <app-input 
+            placeholder="Tour Title" 
+            formControlName="title"
+            [control]="plannerForm.get('title')"
+            errorMessage="Title is required.">
+          </app-input>
+          
+          <textarea 
+            formControlName="description"
+            placeholder="Short description..." 
+            rows="2"
+            class="w-full py-3 px-4 bg-surface-container-lowest border border-outline rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors shadow-sm resize-none"></textarea>
+        </div>
+
+        <div class="flex flex-col relative gap-sm bg-surface p-sm rounded-lg border border-outline-variant/30">
+          <div class="absolute left-7.75 top-9 bottom-9 w-0.5 bg-outline-variant/40 rounded-full z-0"></div>
+          
+          <div class="relative z-10 flex gap-sm items-center">
+            <span class="material-symbols-outlined text-outline shrink-0">radio_button_checked</span>
+            <app-input 
+              class="flex-1"
+              placeholder="Starting point..." 
+              formControlName="startLocation"
+              [control]="plannerForm.get('startLocation')">
+            </app-input>
+          </div>
+
+          <div class="relative z-10 flex gap-sm items-center">
+            <span class="material-symbols-outlined text-primary shrink-0">location_on</span>
+            <app-input 
+              class="flex-1"
+              placeholder="Destination" 
+              formControlName="endLocation"
+              [control]="plannerForm.get('endLocation')">
+            </app-input>
+          </div>
+        </div>
+
+        <app-transport-type-selector 
+          [selected]="plannerForm.get('transportType')?.value || 'Hiking'"
+          (selectionChange)="onTransportTypeChange($event)">
+        </app-transport-type-selector>
+
+        <div class="grid grid-cols-2 gap-4 pt-md border-t border-outline-variant/30">
+          
+          <div class="flex flex-col">
+            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">EST. DISTANCE</span>
+            <div class="flex items-baseline gap-1">
+              @if (isCalculating()) {
+                <span class="w-16 h-6 bg-surface-container rounded animate-pulse"></span>
+              } @else {
+                <span class="font-title-sm text-title-sm text-on-surface">{{ distance() }}</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">km</span>
+              }
+            </div>
+          </div>
+          
+          <div class="flex flex-col">
+            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">CONDITIONS</span>
+            @if (startLocationSignal()) {
+              <app-weather-widget [location]="startLocationSignal()"></app-weather-widget>
+            } @else {
+              <span class="font-body-sm text-body-sm text-on-surface-variant italic">Enter start location</span>
+            }
+          </div>
+
+          <div class="flex flex-col col-span-2 mt-sm">
+            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">EST. TIME</span>
+            <div class="flex items-baseline gap-1">
+              @if (isCalculating()) {
+                <span class="w-24 h-8 bg-surface-container rounded animate-pulse"></span>
+              } @else {
+                <span class="font-headline-md text-headline-md text-on-surface">{{ estimatedTime() / 3600 | number:'1.0-1' }} hrs</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-sm pt-2">
+          <app-button 
+            (click)="clearRoute()" 
+            label="Clear" 
+            variant="secondary"
+            class="w-1/3">
+          </app-button>
+          
+          <app-button 
+            type="submit" 
+            (click)="saveTour()" 
+            label="Save Tour" 
+            variant="primary" 
+            trailingIcon="save"
+            [disabled]="plannerForm.invalid"
+            class="flex-1">
+          </app-button>
+        </div>
+      </form>
+    </aside>
+  </div>
+</main>

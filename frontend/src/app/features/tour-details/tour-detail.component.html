@@ -44,11 +44,12 @@
                 <div class="text-xs text-secondary uppercase tracking-wider font-bold mb-1">Est. Time</div>
                 <div class="font-title-sm text-on-surface">{{ currentTour.estimatedTime / 3600 | number:'1.0-1' }} hrs</div>
               </div>
-              <div class="w-px h-8 bg-outline-variant/50"></div>
-              <div>
-                <app-weather-widget [location]="currentTour.startLocation"></app-weather-widget>
-              </div>
             </div>
+              <div class="absolute top-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-2 shadow-lg flex gap-md items-center z-10">
+                <div>
+                  <app-weather-widget [location]="currentTour.startLocation"></app-weather-widget>
+                </div>
+              </div>
           </div>
 
           <div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant">
