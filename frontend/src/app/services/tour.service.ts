@@ -51,4 +51,41 @@ export class TourService {
     const tour = this.mockTours.find(t => t.id === id);
     return of(tour).pipe(delay(300));
   }
+
+createTour(newTour: Partial<Tour>): Observable<Tour> {
+    const nextId = Math.max(...this.mockTours.map(t => t.id), 0) + 1;
+    
+    const tourToSave: Tour = {
+      ...newTour,
+      id: nextId,
+      userId: 1,
+      mapImagePath: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=600', // Default Map Bild
+      computedPopularityScore: 0,
+      computedChildFriendlyScore: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    } as Tour;
+
+    this.mockTours.push(tourToSave);
+    
+    return of(tourToSave).pipe(delay(500));
+  }
+
+  deleteTour(tourId: number): Observable<boolean> {
+    const index = this.mockTours.findIndex(t => t.id === tourId);
+    if (index !== -1) {
+      this.mockTours.splice(index, 1);
+      return of(true).pipe(delay(400));
+    }
+    return of(false);
+  }
+
+  updateTour(tourId: number, updatedData: Partial<Tour>): Observable<Tour | null> {
+    const index = this.mockTours.findIndex(t => t.id === tourId);
+    if (index !== -1) {
+      this.mockTours[index] = { ...this.mockTours[index], ...updatedData, updatedAt: new Date().toISOString() };
+      return of(this.mockTours[index]).pipe(delay(400));
+    }
+    return of(null);
+  }
 }

@@ -21,9 +21,19 @@
           <h1 class="font-display-lg text-display-lg text-on-surface">{{ currentTour.title }}</h1>
         </div>
         <div class="flex gap-sm">
-          <button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-title-sm text-body-sm hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md flex items-center gap-xs">
-            <span class="material-symbols-outlined text-[20px]">edit</span> Edit Tour
-          </button>
+          <app-button 
+            variant="primary" 
+            (click)="editTour()">
+            <span class="material-symbols-outlined text-[20px]">edit</span> 
+            Edit Tour
+          </app-button>
+          
+          <app-button 
+            variant="error" 
+            (click)="deleteTour()">
+            <span class="material-symbols-outlined text-[20px]">delete</span> 
+            Delete Tour
+          </app-button>
         </div>
       </div>
 
