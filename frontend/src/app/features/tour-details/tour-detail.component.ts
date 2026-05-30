@@ -5,13 +5,15 @@ import { TourLog } from '../../models/tour-log.model';
 import { DecimalPipe } from '@angular/common';
 import { TourService } from '../../services/tour.service';
 import { TourLogService } from '../../services/tour-log.service';
-import { TourLogCardComponent } from '../../components/tour-log-card.component/tour-log-card.component';
+import { TourLogCardComponent } from '../../components/tour-log-card/tour-log-card.component';
 import { MapFacadeService } from '../../services/map-facade.service';
+import { TourMapComponent } from '../../components/tour-map/tour-map.component';
+import { WeatherWidgetComponent } from '../../components/weather-widget/weather-widget.component';
 
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [DecimalPipe, TourLogCardComponent],
+  imports: [DecimalPipe, TourLogCardComponent, TourMapComponent, WeatherWidgetComponent],
   templateUrl: './tour-detail.component.html'
 })
 export class TourDetailComponent implements OnInit, OnDestroy {
@@ -39,9 +41,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const tourId = Number(this.route.snapshot.paramMap.get('id'));
-    if (tourId) {
-      this.loadTourData(tourId);
-    }
+    if (tourId) this.loadTourData(tourId);
   }
 
   private loadTourData(tourId: number): void {
