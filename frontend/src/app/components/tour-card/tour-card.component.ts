@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { Tour } from '../../models/tour.model';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-tour-card',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   template: `
     <article [routerLink]="['/tour', tour().id]" class="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(84,95,114,0.04)] border border-outline-variant overflow-hidden flex flex-col group hover:shadow-[0_4px_16px_rgba(84,95,114,0.08)] transition-all cursor-pointer">
       <div class="h-40 w-full bg-surface-container relative overflow-hidden">
@@ -24,7 +25,7 @@ import { RouterLink } from '@angular/router';
           </span>
           <span class="bg-[#EDF2F7] text-secondary font-label-caps text-label-caps px-2 py-1 rounded-full flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">calendar_month</span>
-            {{ tour().estimatedTime / 86400 }} days
+            {{ tour().estimatedTime / 3600 | number:'1.0-1' }} hours
           </span>
         </div>
       </div>

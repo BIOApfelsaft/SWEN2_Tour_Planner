@@ -21,9 +21,19 @@
           <h1 class="font-display-lg text-display-lg text-on-surface">{{ currentTour.title }}</h1>
         </div>
         <div class="flex gap-sm">
-          <button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-title-sm text-body-sm hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md flex items-center gap-xs">
-            <span class="material-symbols-outlined text-[20px]">edit</span> Edit Tour
-          </button>
+          <app-button 
+            variant="primary" 
+            (click)="editTour()">
+            <span class="material-symbols-outlined text-[20px]">edit</span> 
+            Edit Tour
+          </app-button>
+          
+          <app-button 
+            variant="error" 
+            (click)="deleteTour()">
+            <span class="material-symbols-outlined text-[20px]">delete</span> 
+            Delete Tour
+          </app-button>
         </div>
       </div>
 
@@ -32,12 +42,7 @@
         <div class="lg:col-span-8 flex flex-col gap-lg">
           
           <div id="tour-map-container" class="relative w-full h-100 rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100">
-            <div id="tour-map-container" class="relative w-full rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100">
-             
-              <div id="leaflet-map" class="absolute inset-0 w-full h-full z-0"></div>
-            
-              <div class="absolute bottom-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-4 shadow-lg flex gap-md items-center z-10 pointer-events-none"></div>
-            </div>
+            <app-tour-map [tour]="currentTour"></app-tour-map>
             
             <div class="absolute bottom-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-4 shadow-lg flex gap-md items-center z-10">
               <div>
@@ -50,6 +55,11 @@
                 <div class="font-title-sm text-on-surface">{{ currentTour.estimatedTime / 3600 | number:'1.0-1' }} hrs</div>
               </div>
             </div>
+              <div class="absolute top-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-2 shadow-lg flex gap-md items-center z-10">
+                <div>
+                  <app-weather-widget [location]="currentTour.startLocation"></app-weather-widget>
+                </div>
+              </div>
           </div>
 
           <div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant">
