@@ -1,4 +1,3 @@
-// src/app/components/tour-map/tour-map.component.ts
 import { Component, input, inject, effect, OnDestroy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Tour } from '../../models/tour.model';
@@ -28,7 +27,6 @@ import { MapFacadeService } from '../../services/map-facade.service';
       </div>
     </div>
   `,
-  host: { 'class': 'block w-full' }
 })
 export class TourMapComponent implements OnDestroy {
   tour = input.required<Tour>();

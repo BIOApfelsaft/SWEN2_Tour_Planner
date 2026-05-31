@@ -1,0 +1,91 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-16">
+  
+  <div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm transition-opacity" (click)="closeModal.emit()"></div>
+
+  <div class="relative bg-surface-container-lowest rounded-xl p-md shadow-2xl w-full flex flex-col gap-md max-h-[95vh] overflow-y-auto">
+    
+    <div class="flex justify-between items-center border-b border-outline-variant/30 pb-sm">
+      <h2 class="font-headline-md text-headline-md text-on-surface">
+        {{ log() ? 'Edit Log' : 'Log your Journey' }}
+      </h2>
+      <button (click)="closeModal.emit()" class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="logForm" (ngSubmit)="submitForm()" class="flex flex-col gap-sm">
+      
+      <div class="grid grid-cols-2 gap-sm">
+        <app-input label="Start Date" type="date" formControlName="startDate" [control]="logForm.get('startDate')"></app-input>
+        <app-input label="Start Time" type="time" formControlName="startTime" [control]="logForm.get('startTime')"></app-input>
+        
+        <app-input label="End Date" type="date" formControlName="endDate" [control]="logForm.get('endDate')"></app-input>
+        <app-input label="End Time" type="time" formControlName="endTime" [control]="logForm.get('endTime')"></app-input>
+      </div>
+
+      @if (logForm.hasError('dateRangeInvalid') && (logForm.touched || logForm.dirty)) {
+        <div class="text-error bg-error-container text-body-sm p-2 rounded-md border border-error/20 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          End date and time must be after the start time.
+        </div>
+      }
+
+      @if (logForm.hasError('futureDateInvalid') && (logForm.touched || logForm.dirty)) {
+        <div class="text-error bg-error-container text-body-sm p-2 rounded-md border border-error/20 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          Tour logs cannot be created for future dates.
+        </div>
+      }
+
+      <div class="mt-2">
+        <app-input label="Total Distance (km)" type="number" formControlName="distance" [control]="logForm.get('distance')"></app-input>
+      </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm p-sm bg-surface-container-low rounded-lg border border-outline-variant/30 mt-2">
+        
+        <div class="flex flex-col gap-2">
+          <label class="font-label-caps text-label-caps text-on-surface-variant">Difficulty</label>
+          <div class="flex items-center gap-3">
+            <input type="range" min="1" max="5" step="1" formControlName="difficulty" class="w-full accent-primary cursor-pointer">
+            
+            <div class="w-36 flex justify-end shrink-0">
+              <app-difficulty-indicator [level]="logForm.get('difficulty')?.value || 3"></app-difficulty-indicator>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="font-label-caps text-label-caps text-on-surface-variant">Rating</label>
+          <div class="flex items-center gap-3">
+            <input type="range" min="1" max="5" step="1" formControlName="rating" class="w-full accent-amber-500 cursor-pointer">
+            
+            <div class="w-36 flex justify-end shrink-0">
+              <app-rating-display [rating]="logForm.get('rating')?.value || 5"></app-rating-display>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col gap-1 mt-2">
+        <label class="font-label-caps text-label-caps text-on-surface-variant">Comment</label>
+        <textarea 
+          formControlName="comment"
+          placeholder="How was the trail? Any special events?" 
+          rows="3"
+          class="w-full py-3 px-4 bg-surface border border-outline rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-1 resize-none shadow-sm"></textarea>
+      </div>
+        
+      <div class="flex gap-sm mt-4 pt-sm border-t border-outline-variant/30">
+        <app-button type="button" label="Cancel" variant="secondary" (click)="closeModal.emit()" class="flex-1"></app-button>
+        
+        <app-button type="submit" 
+          [label]="isLoadingWeather() ? 'Loading Weather...' : (log() ? 'Update Log' : 'Save Log')" 
+          variant="primary" 
+          [disabled]="logForm.invalid || isLoadingWeather()" 
+          class="flex-1">
+        </app-button>
+      </div>
+    </form>
+  </div>
+</div>

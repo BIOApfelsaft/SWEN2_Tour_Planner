@@ -1,0 +1,79 @@
+@if (user(); as currentUser) {
+  <div class="p-lg md:p-xl max-w-7xl mx-auto space-y-xl">
+    
+    <section class="relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm border border-outline-variant p-lg flex flex-col md:flex-row items-center gap-lg">
+      <div class="absolute top-0 left-0 w-full h-32 bg-linear-to-r from-primary to-primary-fixed z-0"></div>
+      
+      <div class="relative z-10 w-32 h-32 rounded-full border-4 border-surface-container-lowest overflow-hidden shadow-md shrink-0">
+        <img [src]="currentUser.avatarUrl" [alt]="currentUser.name" class="w-full h-full object-cover">
+      </div>
+      
+      <div class="relative z-10 flex-1 text-center md:text-left">
+        <h1 class="font-headline-lg text-headline-lg text-on-primary mb-xs">{{ currentUser.name }}</h1>
+      </div>
+      
+      <div class="relative z-10 flex gap-sm">
+        <app-button label="Edit Cover" variant="primary"></app-button>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+      
+      <div class="lg:col-span-2 space-y-lg">
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-lg">
+          <div class="mb-lg">
+            <h3 class="font-headline-md text-headline-md text-on-surface">Account Details</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Update your personal information and basic settings.</p>
+          </div>
+          
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-md">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <app-input label="Full Name" type="text" formControlName="name" [control]="profileForm.get('name')"></app-input>
+              <app-input label="Email Address" type="email" formControlName="email" [control]="profileForm.get('email')"></app-input>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md pt-sm">
+              <app-input label="Password" type="password" formControlName="password" [control]="profileForm.get('password')"></app-input>
+            </div>
+            
+            <div class="flex justify-end pt-md border-t border-outline-variant/30 mt-md">
+              <app-button type="submit" [label]="isSaving() ? 'Saving...' : 'Save Changes'" variant="primary" [disabled]="profileForm.invalid || isSaving()"></app-button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div class="space-y-lg">
+        <div class="grid grid-cols-2 gap-sm">
+          
+          <div class="col-span-2 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-md flex items-center justify-between">
+            <div>
+              <p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">Lifetime Distance</p>
+              <p class="font-headline-md text-headline-md text-primary">{{ totalDistance() | number:'1.0-1' }} <span class="text-title-sm text-on-surface-variant">km</span></p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[24px]">hiking</span>
+            </div>
+          </div>
+          
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-md flex flex-col justify-between h-32">
+            <span class="material-symbols-outlined text-outline">library_books</span>
+            <div>
+              <p class="font-headline-md text-headline-md text-on-surface">{{ totalLogs() }}</p>
+              <p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Total Logs</p>
+            </div>
+          </div>
+          
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-md flex flex-col justify-between h-32">
+            <span class="material-symbols-outlined text-outline">timer</span>
+            <div>
+              <p class="font-headline-md text-headline-md text-on-surface">{{ totalTime() | number:'1.0-1' }} <span class="text-title-sm text-on-surface-variant font-normal">hrs</span></p>
+              <p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Total Time</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+}

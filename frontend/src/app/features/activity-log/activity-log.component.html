@@ -1,0 +1,86 @@
+<main class="flex-1 overflow-y-auto p-6 xl:p-8 bg-surface-container-highest">
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+      <div>
+        <h1 class="font-headline-md text-headline-md text-on-surface mb-2">My Activity Logs</h1>
+        <p class="text-on-surface-variant font-body-sm">Review and manage your past adventures.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 items-center">
+        </div>
+    </div>
+
+    <div class="bg-surface rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+      
+      <div class="hidden xl:grid grid-cols-12 gap-4 p-4 border-b border-outline-variant bg-surface-container text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+        <div class="col-span-2">Date</div>
+        <div class="col-span-3">Tour Details</div>
+        <div class="col-span-2">Stats</div>
+        <div class="col-span-2">Difficulty</div>
+        <div class="col-span-2">Rating</div>
+        <div class="col-span-1 text-right">Actions</div>
+      </div>
+
+      <div class="flex flex-col divide-y divide-outline-variant">
+        
+        @for (log of enrichedLogs(); track log.id) {
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 p-4 items-center hover:bg-surface-container-low transition-colors group">
+            
+            <div class="col-span-1 xl:col-span-2 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container shrink-0">
+                <span class="material-symbols-outlined">{{ getIconForTransport(log.transportType) }}</span>
+              </div>
+              <div>
+                <div class="font-medium text-on-surface text-sm">{{ log.logDateTime | date:'MMM d, yyyy' }}</div>
+                <div class="text-xs text-on-surface-variant">{{ log.logDateTime | date:'shortTime' }}</div>
+              </div>
+            </div>
+
+            <div class="col-span-1 xl:col-span-3">
+              <div class="font-semibold text-on-surface">{{ log.tourTitle }}</div>
+              <div class="text-xs text-on-surface-variant truncate">{{ log.tourLocation }}</div>
+            </div>
+
+            <div class="col-span-1 xl:col-span-2 flex flex-row xl:flex-col gap-2 xl:gap-0 text-sm">
+              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">route</span> {{ log.totalDistance }} km</div>
+              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">timer</span> {{ log.totalTime / 3600 | number:'1.0-1' }} hrs</div>
+            </div>
+
+            <div class="col-span-1 xl:col-span-2">
+              <app-difficulty-indicator [level]="log.difficulty"></app-difficulty-indicator>
+            </div>
+
+            <div class="col-span-1 xl:col-span-2 flex items-center">
+              <app-rating-display [rating]="log.rating"></app-rating-display>
+            </div>
+
+            <div class="col-span-1 xl:col-span-1 flex justify-end gap-2 xl:opacity-0 group-hover:opacity-100 transition-opacity">
+              <button (click)="editLog(log)" class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container rounded-md transition-colors">
+                <span class="material-symbols-outlined text-[20px]">edit</span>
+              </button>
+              <button (click)="deleteLog(log.id)" class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors">
+                <span class="material-symbols-outlined text-[20px]">delete</span>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="p-8 text-center text-on-surface-variant">
+            No activity logs found.
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+
+  @if (isEditModalOpen() && selectedTourForEdit()) {
+    <app-tour-log-modal
+      [tourId]="selectedTourForEdit()!.id"
+      [defaultDistance]="selectedTourForEdit()!.distance"
+      [location]="selectedTourForEdit()!.startLocation"
+      [log]="selectedLogToEdit()"
+      (closeModal)="isEditModalOpen.set(false)"
+      (saveLog)="saveUpdatedLog($event)">
+    </app-tour-log-modal>
+  }
+</main>

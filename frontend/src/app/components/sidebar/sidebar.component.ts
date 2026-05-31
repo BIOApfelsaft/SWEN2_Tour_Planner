@@ -7,9 +7,6 @@ import { LayoutService } from '../../services/layout.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
-  host: {
-    'class': 'block'
-  }
 })
 export class SidebarComponent {
   layoutService = inject(LayoutService);
@@ -17,8 +14,7 @@ export class SidebarComponent {
   navItems = [
     { path: '/', icon: 'dashboard', label: 'Dashboard' },
     { path: '/tour-planner', icon: 'explore', label: 'Tour Planner' },
-    { path: '/logs', icon: 'history_edu', label: 'My Logs' },
-    { path: '/statistics', icon: 'analytics', label: 'Statistics' },
-    { path: '/settings', icon: 'settings', label: 'Settings' }
+    { path: '/activity-log', icon: 'history_edu', label: 'My Logs' },
+    { path: '/profile', icon: 'person', label: 'Profile' },
   ];
 }

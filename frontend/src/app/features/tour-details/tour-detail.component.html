@@ -89,9 +89,12 @@
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <h3 class="font-headline-md text-headline-md mb-2 relative z-10">Document Your Journey</h3>
             <p class="text-body-sm opacity-90 mb-6 relative z-10">Keep a detailed record of your ascents, environmental conditions, and personal tracking metrics.</p>
-            <button class="w-full bg-white text-primary font-title-sm py-3 rounded-lg shadow-sm hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs relative z-10">
-              <span class="material-symbols-outlined text-[20px]">add_circle</span> Add New Log
-            </button>
+            <app-button 
+              variant="secondary" 
+              (click)="openCreateModal()">
+              <span class="material-symbols-outlined">add_circle</span> 
+              Add New Log
+            </app-button>      
           </div>
         </div>
       </div>
@@ -116,3 +119,16 @@
     }
   </div>
 </main>
+
+@if (isAddingLog() && tour(); as currentTour) {
+  <app-tour-log-modal
+    [tourId]="currentTour.id"
+    [defaultDistance]="currentTour.distance"
+    [location]="currentTour.startLocation"
+    
+    [log]="selectedLogToEdit()" 
+    
+    (closeModal)="closeLogModal()"
+    (saveLog)="saveLog($event)">
+  </app-tour-log-modal>
+}

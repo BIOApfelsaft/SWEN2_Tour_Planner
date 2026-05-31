@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, effect, OnDestroy } from '@angular/core';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Tour } from '../../models/tour.model';
 import { TourLog } from '../../models/tour-log.model';
 import { DecimalPipe } from '@angular/common';
@@ -10,11 +10,12 @@ import { MapFacadeService } from '../../services/map-facade.service';
 import { TourMapComponent } from '../../components/tour-map/tour-map.component';
 import { WeatherWidgetComponent } from '../../components/weather-widget/weather-widget.component';
 import { ButtonComponent } from '../../components/button/button.component';
+import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.component';
 
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [DecimalPipe, TourLogCardComponent, TourMapComponent, WeatherWidgetComponent, RouterLink, ButtonComponent],
+  imports: [DecimalPipe, TourLogCardComponent, TourMapComponent, WeatherWidgetComponent, ButtonComponent, TourLogModalComponent],
   templateUrl: './tour-detail.component.html'
 })
 export class TourDetailComponent implements OnInit, OnDestroy {
@@ -23,8 +24,12 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   private tourLogService = inject(TourLogService);
   private mapFacade = inject(MapFacadeService);
   private router = inject(Router);
+
   tour = signal<Tour | null>(null);
   logs = signal<TourLog[]>([]);
+  
+  isAddingLog = signal<Boolean>(false);
+  selectedLogToEdit = signal<TourLog | null>(null);
 
   isLoading = signal<Boolean>(true);
 
@@ -33,8 +38,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
     effect(() => {
       if (!this.isLoading() && this.tour()) {
         setTimeout(() => {
-          this.mapFacade.initMap('leaflet-map');
-          this.mapFacade.drawMockRoute();
+          this.mapFacade.initMap(`leaflet-map-${this.tour()?.id}`);
         }, 0);
       }
     });
@@ -91,14 +95,46 @@ export class TourDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  openCreateModal() {
+    this.selectedLogToEdit.set(null);
+    this.isAddingLog.set(true);
+  }
+
   handleEditLog(log: TourLog) {
-    console.log('Edit log triggered for:', log.id);
+    this.selectedLogToEdit.set(log); 
+    this.isAddingLog.set(true);
+  }
+
+  closeLogModal() {
+    this.isAddingLog.set(false);
+    this.selectedLogToEdit.set(null);
+  }
+
+  saveLog(logData: any) {
+    if (logData.id) {
+      // UPDATE: If an ID exists, we update the existing log
+      this.tourLogService.updateLog(logData.id, logData).subscribe(updatedLog => {
+        if (updatedLog) {
+          this.logs.update(currentLogs => 
+            currentLogs.map(l => l.id === updatedLog.id ? updatedLog : l)
+          );
+        }
+        this.closeLogModal();
+      });
+    } else {
+      // CREATE: If no ID exists, we create a new log
+      this.tourLogService.addLog(logData).subscribe(savedLog => {
+        this.logs.update(currentLogs => [savedLog, ...currentLogs]);
+        this.closeLogModal();
+      });
+    }
   }
 
   handleDeleteLog(log: TourLog) {
-    console.log('Delete log triggered for:', log.id);
+    this.tourLogService.deleteLog(log.id).subscribe(() => {
+      this.logs.update(currentLogs => currentLogs.filter(l => l.id !== log.id));
+    });
   }
-
 
   ngOnDestroy(): void {
     this.mapFacade.destroyMap();

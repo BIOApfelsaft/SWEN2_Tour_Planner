@@ -35,9 +35,9 @@ export class ButtonComponent {
         if (this.variant() === 'primary') {
             return `${base} bg-primary hover:bg-surface-tint text-on-primary shadow-[0_4px_16px_rgba(84,95,114,0.08)] ${this.disabled() ? 'opacity-50 cursor-not-allowed' : ''}`;
         } else if (this.variant() === 'error') {
-            return `${base} bg-error hover:bg-error-container text-on-error shadow-[0_4px_16px_rgba(84,95,114,0.08)] ${this.disabled() ? 'opacity-50 cursor-not-allowed' : ''}`;
+            return `${base} bg-error hover:bg-error-hover text-on-error shadow-[0_4px_16px_rgba(84,95,114,0.08)] ${this.disabled() ? 'opacity-50 cursor-not-allowed' : ''}`;
         } else {
-            return `${base} bg-surface border border-outline text-on-surface hover:bg-surface-container-low`;
+            return `${base} bg-secondary border border-outline text-on-secondary hover:bg-on-secondary-container`;
         }
     });
 }

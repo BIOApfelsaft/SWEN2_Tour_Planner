@@ -26,7 +26,6 @@ import { Component, input, output } from '@angular/core';
 
     </div>
   `,
-  host: { 'class': 'block w-full' }
 })
 export class TransportTypeSelectorComponent {
   selected = input.required<string>();
