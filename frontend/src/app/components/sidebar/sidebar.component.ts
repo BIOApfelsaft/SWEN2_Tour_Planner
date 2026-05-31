@@ -7,9 +7,6 @@ import { LayoutService } from '../../services/layout.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
-  host: {
-    'class': 'block'
-  }
 })
 export class SidebarComponent {
   layoutService = inject(LayoutService);

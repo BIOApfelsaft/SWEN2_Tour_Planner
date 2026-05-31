@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
     selector: 'app-header',
     imports: [RouterLink],
     template: `
-        <header [routerLink]="['/tour-planner']" class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
+        <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
     
             <button (click)="layoutService.toggleMenu()" class="md:hidden p-2 text-on-surface hover:bg-surface-container rounded-lg transition-colors">
                 <span class="material-symbols-outlined">menu</span>
@@ -31,7 +31,7 @@ import { RouterLink } from '@angular/router';
                 <span class="material-symbols-outlined">account_circle</span>
                 </button>
 
-                <button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-title-sm text-title-sm hover:bg-surface-tint transition-colors active:scale-95 duration-150 shadow-[0_4px_16px_rgba(84,95,114,0.08)] md:block">
+                <button [routerLink]="['/tour-planner']" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-title-sm text-title-sm hover:bg-surface-tint transition-colors active:scale-95 duration-150 shadow-[0_4px_16px_rgba(84,95,114,0.08)] md:block">
                     New Tour
                 </button>
 

@@ -1,38 +1,40 @@
-<div class="bg-surface flex flex-col rounded-xl p-md shadow-sm border border-outline-variant hover:shadow-md transition-shadow group">
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant hover:shadow-md transition-shadow group relative z-0">
     <div class="flex flex-col md:flex-row gap-sm justify-between">
-    <div class="flex-1">
         
-        <div class="flex items-center gap-md mb-xs">
-        <span class="font-title-sm text-on-surface">{{ log().logDateTime | date:'mediumDate' }}</span>
-        <span class="text-secondary text-body-sm flex items-center gap-xs bg-surface-container px-2 py-0.5 rounded">
-            <span class="material-symbols-outlined text-[16px]">cloud</span>
-            {{ log().temperature }}°C, {{ log().weatherCondition }}
-        </span>
+        <div class="flex-1">
+            <div class="flex items-center gap-md mb-xs">
+                <span class="font-title-sm text-on-surface">{{ log().logDateTime | date:'mediumDate' }}</span>
+                
+                <app-rating-display [rating]="log().rating"></app-rating-display>
+
+                <span class="text-secondary text-body-sm flex items-center gap-xs bg-surface-container px-2 py-0.5 rounded">
+                    <span class="material-symbols-outlined text-[16px]">cloud</span>
+                    {{ log().temperature }}°C, {{ log().weatherCondition }}
+                </span>
+            </div>
+            
+            <p class="text-on-surface-variant font-body-sm mb-md">"{{ log().comment }}"</p>
+            
+            <div class="flex flex-wrap gap-sm text-xs font-bold items-center">
+                <app-difficulty-indicator [level]="log().difficulty"></app-difficulty-indicator>
+
+                <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
+                    <span class="material-symbols-outlined text-[14px] mr-1">timer</span> {{ log().totalTime / 3600 | number:'1.0-1' }} hrs
+                </div>
+                <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
+                    <span class="material-symbols-outlined text-[14px] mr-1">route</span> {{ log().totalDistance }} km
+                </div>
+            </div>
         </div>
-        
-        <p class="text-on-surface-variant font-body-sm mb-md">"{{ log().comment }}"</p>
-        
-        <div class="flex flex-wrap gap-sm text-xs font-bold">
-        <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-            <span class="material-symbols-outlined text-[14px] mr-1">speed</span> Difficulty: {{ log().difficulty }}/5
+
+        <div class="flex gap-xs justify-end items-start md:opacity-0 group-hover:opacity-100 transition-opacity mt-4 md:mt-0">
+            <button (click)="onEdit()" class="p-2 text-secondary hover:text-primary hover:bg-primary-container rounded-md transition-colors" title="Edit Log">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+            </button>
+            <button (click)="onDelete()" class="p-2 text-secondary hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete Log">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
         </div>
-        <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-            <span class="material-symbols-outlined text-[14px] mr-1">star</span> Rating: {{ log().rating }}/5
-        </div>
-        <div class="flex items-center text-secondary bg-surface-container-low px-2 py-1 rounded">
-            <span class="material-symbols-outlined text-[14px] mr-1">route</span> {{ log().totalDistance }} km
-        </div>
-        </div>
-    </div>
-    
-    <div class="flex gap-xs justify-end items-start md:opacity-0 group-hover:opacity-100 transition-opacity">
-        <button (click)="onEdit()" class="p-2 text-secondary hover:text-primary hover:bg-primary-container rounded-md transition-colors" title="Edit Log">
-        <span class="material-symbols-outlined text-[18px]">edit</span>
-        </button>
-        <button (click)="onDelete()" class="p-2 text-secondary hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete Log">
-        <span class="material-symbols-outlined text-[18px]">delete</span>
-        </button>
-    </div>
-    
+
     </div>
 </div>
