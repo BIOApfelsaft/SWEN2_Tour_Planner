@@ -1,11 +1,33 @@
 import { Component, input, output, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, ValidationErrors, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputComponent } from '../input/input.component';
 import { ButtonComponent } from '../button/button.component';
 import { WeatherService, WeatherData } from '../../services/weather.service';
 import { TourLog } from '../../models/tour-log.model';
 import { RatingDisplayComponent } from '../rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../difficulty-display/difficulty-display.component';
+
+export function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+  const startDate = control.get('startDate')?.value;
+  const startTime = control.get('startTime')?.value;
+  const endDate = control.get('endDate')?.value;
+  const endTime = control.get('endTime')?.value;
+
+  if (!startDate || !startTime || !endDate || !endTime) return null;
+
+  const start = new Date(`${startDate}T${startTime}`);
+  const end = new Date(`${endDate}T${endTime}`);
+  const now = new Date();
+
+  if (start.getTime() > now.getTime() || end.getTime() > now.getTime()) {
+    return { futureDateInvalid: true };
+  }
+
+  if (end.getTime() <= start.getTime()) {
+    return { dateRangeInvalid: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-tour-log-modal',
@@ -41,7 +63,7 @@ logForm = this.fb.group({
     difficulty: [3, [Validators.required, Validators.min(1), Validators.max(5)]],
     rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
     comment: ['']
-  });
+  }, { validators: dateRangeValidator });
 
   ngOnInit() {
     const existingLog = this.log();

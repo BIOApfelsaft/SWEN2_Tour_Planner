@@ -23,6 +23,20 @@
         <app-input label="End Time" type="time" formControlName="endTime" [control]="logForm.get('endTime')"></app-input>
       </div>
 
+      @if (logForm.hasError('dateRangeInvalid') && (logForm.touched || logForm.dirty)) {
+        <div class="text-error bg-error-container text-body-sm p-2 rounded-md border border-error/20 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          End date and time must be after the start time.
+        </div>
+      }
+
+      @if (logForm.hasError('futureDateInvalid') && (logForm.touched || logForm.dirty)) {
+        <div class="text-error bg-error-container text-body-sm p-2 rounded-md border border-error/20 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          Tour logs cannot be created for future dates.
+        </div>
+      }
+
       <div class="mt-2">
         <app-input label="Total Distance (km)" type="number" formControlName="distance" [control]="logForm.get('distance')"></app-input>
       </div>
