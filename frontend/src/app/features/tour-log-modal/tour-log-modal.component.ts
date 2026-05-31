@@ -1,11 +1,11 @@
 import { Component, input, output, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, ValidationErrors, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputComponent } from '../input/input.component';
-import { ButtonComponent } from '../button/button.component';
+import { InputComponent } from '../../components/input/input.component';
+import { ButtonComponent } from '../../components/button/button.component';
 import { WeatherService, WeatherData } from '../../services/weather.service';
 import { TourLog } from '../../models/tour-log.model';
-import { RatingDisplayComponent } from '../rating-display/rating-display.component';
-import { DifficultyIndicatorComponent } from '../difficulty-display/difficulty-display.component';
+import { RatingDisplayComponent } from '../../components/rating-display/rating-display.component';
+import { DifficultyIndicatorComponent } from '../../components/difficulty-display/difficulty-display.component';
 
 export function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
   const startDate = control.get('startDate')?.value;

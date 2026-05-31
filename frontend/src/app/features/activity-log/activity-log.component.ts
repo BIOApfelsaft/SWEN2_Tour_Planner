@@ -6,7 +6,7 @@ import { TourLog } from '../../models/tour-log.model';
 import { Tour } from '../../models/tour.model';
 import { RatingDisplayComponent } from '../../components/rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../../components/difficulty-display/difficulty-display.component';
-import { TourLogModalComponent } from '../../components/tour-log-modal/tour-log-modal.component';
+import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.component';
 
 export interface EnrichedTourLog extends TourLog {
   tourTitle: string;

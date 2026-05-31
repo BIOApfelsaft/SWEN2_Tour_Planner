@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
 import { RouterLink } from '@angular/router';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user.model';
 
 @Component({
     selector: 'app-header',
@@ -27,9 +29,13 @@ import { RouterLink } from '@angular/router';
                 />
                 </div>
                 
-                <button class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150 flex items-center justify-center">
-                <span class="material-symbols-outlined">account_circle</span>
-                </button>
+                <div class="flex items-center gap-4">
+                    @if (user(); as currentUser) {
+                        <a routerLink="/profile" class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden hover:border-primary transition-colors cursor-pointer block shrink-0">
+                            <img [src]="currentUser.avatarUrl" [alt]="currentUser.name" class="w-full h-full object-cover">
+                        </a>
+                    }
+                </div>
 
                 <button [routerLink]="['/tour-planner']" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-title-sm text-title-sm hover:bg-surface-tint transition-colors active:scale-95 duration-150 shadow-[0_4px_16px_rgba(84,95,114,0.08)] md:block">
                     New Tour
@@ -39,7 +45,12 @@ import { RouterLink } from '@angular/router';
         </header>
     `,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
     layoutService = inject(LayoutService);
+    userService = inject(UserService);
+    user = signal<User | null>(null);
 
+    ngOnInit() {
+        this.userService.getCurrentUser().subscribe(u => this.user.set(u));
+    }
 }

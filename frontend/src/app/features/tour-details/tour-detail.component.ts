@@ -10,7 +10,7 @@ import { MapFacadeService } from '../../services/map-facade.service';
 import { TourMapComponent } from '../../components/tour-map/tour-map.component';
 import { WeatherWidgetComponent } from '../../components/weather-widget/weather-widget.component';
 import { ButtonComponent } from '../../components/button/button.component';
-import { TourLogModalComponent } from '../../components/tour-log-modal/tour-log-modal.component';
+import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.component';
 
 @Component({
   selector: 'app-tour-detail',
