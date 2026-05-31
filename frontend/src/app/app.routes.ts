@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
@@ -9,32 +10,32 @@ import { ActivityLogComponent } from './features/activity-log/activity-log.compo
 import { UserProfileComponent } from './features/user-profile/user-profile.component';
 
 export const routes: Routes = [
-    { path: "", component: MainLayoutComponent, children: [
-        { path: "", component: DashboardComponent }
-    ]},
-
     { path: "login", component: AuthLayoutComponent, children: [
         { path: "", component: LoginComponent }
     ]},
 
+    { path: "", component: MainLayoutComponent, children: [
+        { path: "", component: DashboardComponent, canActivate: [authGuard] }
+    ]},
+
     { path: "tour-planner", component: MainLayoutComponent, children: [
-        { path: "", component: TourPlannerComponent }
+        { path: "", component: TourPlannerComponent, canActivate: [authGuard] }
     ]},
 
     { path: "tour-planner/:id", component: MainLayoutComponent, children: [
-        { path: "", component: TourPlannerComponent }
+        { path: "", component: TourPlannerComponent, canActivate: [authGuard] }
     ]},
     
     { path: "tour/:id", component: MainLayoutComponent, children: [
-        { path: "", component: TourDetailComponent }
+        { path: "", component: TourDetailComponent, canActivate: [authGuard] }
     ]},
 
     { path: "activity-log", component: MainLayoutComponent, children: [
-        { path: "", component: ActivityLogComponent }
+        { path: "", component: ActivityLogComponent, canActivate: [authGuard] }
     ]},
 
     { path: "profile", component: MainLayoutComponent, children: [
-        { path: "", component: UserProfileComponent }
+        { path: "", component: UserProfileComponent, canActivate: [authGuard] }
     ]},
 
     { path: "**", redirectTo: "login" },
