@@ -10,7 +10,7 @@ export class UserService {
     id: 1,
     name: 'Alex Harrison',
     email: 'alex.harrison@example.com',
-    avatarUrl: 'https://i.pravatar.cc/150?u=marcel',
+    avatarUrl: 'https://i.pravatar.cc/150?u=alex',
   };
 
   getCurrentUser(): Observable<User> {
