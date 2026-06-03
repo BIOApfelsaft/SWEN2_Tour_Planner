@@ -7,7 +7,9 @@ import { Component, input, computed } from '@angular/core';
         <button 
             [type]="type()" 
             [class]="combinedClasses()"
-            [disabled]="disabled()">
+            [disabled]="disabled()"
+            [attr.aria-label]="ariaLabel()"
+            >
       
             @if (label()) {
                 {{ label() }}
@@ -39,5 +41,10 @@ export class ButtonComponent {
         } else {
             return `${base} bg-secondary border border-outline text-on-secondary hover:bg-on-secondary-container`;
         }
+    });
+
+    ariaLabel = computed(() => {
+        const lbl = this.label();
+        return lbl ? lbl : this.trailingIcon() ? `Button with icon ${this.trailingIcon()}` : 'button';
     });
 }

@@ -8,6 +8,27 @@ import { LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '
 })
 
 export class AuthService {
+  // Mock implementation for demonstration
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    const mockResponse: LoginResponse = { token: 'mock-jwt-token' };
+    return new Observable<LoginResponse>(observer => {
+      setTimeout(() => {
+        observer.next(mockResponse);
+        observer.complete();
+      }, 500);
+    });
+  }
+  
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    const mockResponse: RegisterResponse = { message: 'Registration successful' };
+    return new Observable<RegisterResponse>(observer => {
+      setTimeout(() => {
+        observer.next(mockResponse);
+        observer.complete();
+      }, 500);
+    });
+  }
+  /* Backend Implementation
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:5134/api/auth';
 
@@ -17,5 +38,5 @@ export class AuthService {
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, userData);
-  }
+  }*/
 }
