@@ -11,8 +11,7 @@ export interface WeatherData {
   providedIn: 'root'
 })
 export class WeatherService {
-
-  // Mock Data
+  // Mockdata
   getCurrentWeather(location: string): Observable<WeatherData> {
     const temp = 12 + (location.length % 15); // Irgendwas zwischen 12 und 26 Grad
     

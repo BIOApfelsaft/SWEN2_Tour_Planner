@@ -6,6 +6,7 @@ import { User } from '../models/user.model';
   providedIn: 'root'
 })
 export class UserService {
+  // Mockdata
   private mockUser: User = {
     id: 1,
     name: 'Alex Harrison',

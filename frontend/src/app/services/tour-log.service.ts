@@ -6,6 +6,7 @@ import { TourLog } from '../models/tour-log.model';
   providedIn: 'root'
 })
 export class TourLogService {
+  // Mockdata
   private mockLogs: TourLog[] = [
     {
       id: 1,

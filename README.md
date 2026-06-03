@@ -24,6 +24,10 @@ A web application for creating, managing and tracking tours and tour logs (bike,
 
 ## Setup & Installation
 
+### 0. Current Status
+The frontend is currently implemented with mock services. Backend integration is work in progress. You can run the frontend independently using the steps below.
+For frontend only you can skip steps 3, 4 and 5
+
 ### 1. Prerequisites
 Before you can run the project locally, ensure you have the following software installed:
 
@@ -42,6 +46,7 @@ cd TourPlanner
 ```
 
 ### 3. Configuration (API Keys & Secrets)
+### NOT REQUIRED FOR FRONTEND ONLY
 Create or update .env in the root (.) folder. 
 Create or update the pgpass inside the ./database folder. 
 Create or update the servers.json inside the ./database folder. 
@@ -49,11 +54,13 @@ Create or update the appsettings.Development.json inside the ./backend/TourPlann
 (Note: These files are excluded via .gitignore for security reasons).
 
 ### 4. Database Setup
+### NOT REQUIRED FOR FRONTEND ONLY
 ```bash
 docker-compose up -d
 ```
 
 ### 5. Backend Setup and Start
+### NOT REQUIRED FOR FRONTEND ONLY
 ```bash
 cd backend/TourPlannerAPI
 dotnet run

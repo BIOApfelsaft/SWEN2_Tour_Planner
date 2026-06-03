@@ -7,6 +7,7 @@ import { DashboardStatistic } from '../models/stat.model';
 })
 export class StatsService {
 
+  // Mockdata
   private mockStats: DashboardStatistic[] = [
     { icon: 'explore', label: 'Total Tours', value: '24' },
     { icon: 'directions_walk', label: 'Distance', value: '352 km' },

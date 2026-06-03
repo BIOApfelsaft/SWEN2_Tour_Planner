@@ -8,6 +8,7 @@ export class MapFacadeService {
   private map: L.Map | null = null;
   private routeLayer: L.GeoJSON | null = null;
 
+  // Mockdata
   initMap(containerId: string): void {
     this.destroyMap();
 

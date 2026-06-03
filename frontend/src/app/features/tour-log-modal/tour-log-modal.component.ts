@@ -54,7 +54,7 @@ export class TourLogModalComponent implements OnInit {
   fetchedWeather: WeatherData | null = null;
   isLoadingWeather = signal<boolean>(false);
 
-logForm = this.fb.group({
+  logForm = this.fb.group({
     startDate: [new Date().toISOString().split('T')[0], Validators.required],
     startTime: ['08:00', Validators.required],
     endDate: [new Date().toISOString().split('T')[0], Validators.required],
