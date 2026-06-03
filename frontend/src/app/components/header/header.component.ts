@@ -3,10 +3,12 @@ import { LayoutService } from '../../services/layout.service';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
+import { ButtonComponent } from "../button/button.component";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-header',
-    imports: [RouterLink],
+    imports: [RouterLink, ButtonComponent],
     template: `
         <header class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 z-40000 top-0">
     
@@ -36,11 +38,16 @@ import { User } from '../../models/user.model';
                         </a>
                     }
                 </div>
-
-                <button [routerLink]="['/tour-planner']" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-title-sm text-title-sm hover:bg-surface-tint transition-colors active:scale-95 duration-150 shadow-[0_4px_16px_rgba(84,95,114,0.08)] md:block">
+                
+                @if (user()) {
+                    <app-button (click)="authService.logout()" variant="secondary">
+                        Logout
+                    </app-button>
+                }
+                
+                <app-button [routerLink]="['/tour-planner']" variant="primary">
                     New Tour
-                </button>
-
+                </app-button>
             </div>
         </header>
     `,
@@ -48,6 +55,7 @@ import { User } from '../../models/user.model';
 export class HeaderComponent implements OnInit {
     layoutService = inject(LayoutService);
     userService = inject(UserService);
+    authService = inject(AuthService);
     user = signal<User | null>(null);
 
     ngOnInit() {

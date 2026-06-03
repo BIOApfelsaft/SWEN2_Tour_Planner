@@ -1,13 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '../models/auth.model';
+import { routes } from '../app.routes';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class AuthService {
+  private router = inject(Router);
+
   // Mock implementation for demonstration
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const mockResponse: LoginResponse = { token: 'mock-jwt-token' };
@@ -27,6 +31,11 @@ export class AuthService {
         observer.complete();
       }, 500);
     });
+  }
+
+  logout() {
+    localStorage.removeItem('authToken'); 
+    this.router.navigate(['/login']);
   }
   /* Backend Implementation
   private http = inject(HttpClient);
