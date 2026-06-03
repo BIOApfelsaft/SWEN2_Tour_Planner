@@ -11,6 +11,7 @@ export interface RouteCalculationResult {
   providedIn: 'root'
 })
 export class OpenRouteFacadeService {
+  // Mockdata
   calculateRoute(start: string, end: string, type: string): Observable<RouteCalculationResult> {
     const mockResult: RouteCalculationResult = {
       distance: Math.floor(Math.random() * 50) + 5,

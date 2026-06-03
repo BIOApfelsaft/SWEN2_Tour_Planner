@@ -6,6 +6,7 @@ import { Tour } from '../models/tour.model';
   providedIn: 'root'
 })
 export class TourService {
+  // Mockdata
   private mockTours: Tour[] = [
   {
       id: 1,

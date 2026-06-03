@@ -12,7 +12,7 @@ import { routes } from '../app.routes';
 export class AuthService {
   private router = inject(Router);
 
-  // Mock implementation for demonstration
+  // Mock implementation
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const mockResponse: LoginResponse = { token: 'mock-jwt-token' };
     return new Observable<LoginResponse>(observer => {
