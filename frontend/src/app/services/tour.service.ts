@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, delay } from 'rxjs';
 import { Tour } from '../models/tour.model';
 
@@ -6,6 +7,9 @@ import { Tour } from '../models/tour.model';
   providedIn: 'root'
 })
 export class TourService {
+    private http = inject(HttpClient);
+    private apiUrl = 'http://localhost:5134/api/Tour';
+
   // Mockdata
   private mockTours: Tour[] = [
   {
@@ -45,7 +49,7 @@ export class TourService {
   ];
 
   getTours(): Observable<Tour[]> {
-    return of(this.mockTours).pipe(delay(500));
+    return this.http.get<Tour[]>(`${this.apiUrl}`, localStorage.getItem('authToken') ? { headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } } : {});
   }
 
   getTourById(id: number): Observable<Tour | undefined> {
