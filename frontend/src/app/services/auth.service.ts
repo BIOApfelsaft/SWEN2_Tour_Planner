@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router, RouterStateSnapshot } from '@angular/router';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '../models/auth.model';
-import { routes } from '../app.routes';
 
 @Injectable({
   providedIn: 'root'
