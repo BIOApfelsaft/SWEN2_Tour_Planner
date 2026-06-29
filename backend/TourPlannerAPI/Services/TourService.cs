@@ -1,9 +1,5 @@
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TourPlannerAPI.Models;
-// Make sure to include your DTO namespace if needed, e.g., using TourPlannerAPI.DTOs;
+using TourPlannerAPI.DTOs;
 
 namespace TourPlannerAPI.Services;
 
@@ -13,7 +9,6 @@ public class TourService : ITourService
     private readonly ITourRepository _tourRepository;
     private readonly OpenRouteServiceClient _orsClient;
 
-    // Inject the OpenRouteServiceClient here to fix "_orsClient does not exist"
     public TourService(
         ILogger<TourService> logger, 
         ITourRepository tourRepository,
@@ -36,12 +31,9 @@ public class TourService : ITourService
         return await _tourRepository.GetTourByIdAsync(id);
     }
 
-    // Accepts CreateTourDto so we can extract StartLng, StartLat, etc.
     public async Task<Tour> CreateTourAsync(CreateTourDto dto)
     {
         _logger.LogInformation("Creating new tour and fetching ORS route.");
-
-        // Storing in a single variable fixes the "var time is not nullable aware" tuple error
         var routeData = await _orsClient.GetRouteDataAsync(
             dto.StartLng, dto.StartLat, dto.EndLng, dto.EndLat, dto.TransportType);
 
@@ -53,14 +45,14 @@ public class TourService : ITourService
             StartLocation = dto.StartLocation,
             EndLocation = dto.EndLocation,
             TransportType = dto.TransportType,
-            Distance = routeData.distance,   // Accessing from the explicit variable
-            EstimatedTime = routeData.time,  // Accessing from the explicit variable
+            Distance = routeData.distance,   
+            EstimatedTime = routeData.time,  
             MapImagePath = dto.MapImagePath,
-            RouteGeojson = routeData.geoJson,// Accessing from the explicit variable
+            RouteGeojson = routeData.geoJson,
             ComputedPopularityScore = 0,
             ComputedChildFriendlyScore = 0,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
 
         return await _tourRepository.CreateTourAsync(tour);

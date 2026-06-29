@@ -17,7 +17,7 @@ public class OpenRouteServiceClient
     {
         var url = $"https://api.openrouteservice.org/v2/directions/{profile}/geojson";
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", _apiKey);
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _apiKey);
 
         var payload = new
         {

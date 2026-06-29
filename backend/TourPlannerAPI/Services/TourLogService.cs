@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Threading.Tasks;
 using TourPlannerAPI.Models;
+using TourPlannerAPI.DTOs;
+
+namespace TourPlannerAPI.Services;
 
 public class TourLogService : ITourLogService
 {
@@ -31,22 +31,53 @@ public class TourLogService : ITourLogService
         return await _tourLogRepository.GetTourLogByIdAsync(id);
     }
 
-    public async Task AddTourLogAsync(TourLog tourLog)
+    public async Task<TourLog> AddTourLogAsync(CreateTourLogDto dto)
     {
-        _logger.LogInformation("Adding new tour log for TourId: {TourId}", tourLog.TourId);
-        await _tourLogRepository.AddTourLogAsync(tourLog);
+        _logger.LogInformation("Adding new tour log for TourId: {TourId}", dto.TourId);
         
-        // Update computed fields on the parent tour
+        var tourLog = new TourLog
+        {
+            TourId = dto.TourId,
+            LogDateTime = dto.LogDateTime,
+            Comment = dto.Comment,
+            Difficulty = dto.Difficulty,
+            TotalDistance = dto.TotalDistance,
+            TotalTime = dto.TotalTime,
+            Rating = dto.Rating,
+            WeatherCondition = dto.WeatherCondition,
+            Temperature = dto.Temperature,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
+
+        await _tourLogRepository.AddTourLogAsync(tourLog);
         await RecalculateTourScoresAsync(tourLog.TourId);
+        
+        return tourLog;
     }
 
-    public async Task UpdateTourLogAsync(TourLog tourLog)
+    public async Task<bool> UpdateTourLogAsync(int id, CreateTourLogDto dto)
     {
-        _logger.LogInformation("Updating tour log ID: {Id}", tourLog.Id);
-        await _tourLogRepository.UpdateTourLogAsync(tourLog);
+        _logger.LogInformation("Updating tour log ID: {Id}", id);
         
-        // Update computed fields on the parent tour
-        await RecalculateTourScoresAsync(tourLog.TourId);
+        var existingLog = await _tourLogRepository.GetTourLogByIdAsync(id);
+        if (existingLog == null) return false;
+
+        existingLog.TourId = dto.TourId;
+        existingLog.LogDateTime = dto.LogDateTime;
+        existingLog.Comment = dto.Comment;
+        existingLog.Difficulty = dto.Difficulty;
+        existingLog.TotalDistance = dto.TotalDistance;
+        existingLog.TotalTime = dto.TotalTime;
+        existingLog.Rating = dto.Rating;
+        existingLog.WeatherCondition = dto.WeatherCondition;
+        existingLog.Temperature = dto.Temperature;
+        existingLog.UpdatedAt = DateTime.Now;
+
+        await _tourLogRepository.UpdateTourLogAsync(existingLog);
+        await RecalculateTourScoresAsync(existingLog.TourId);
+        
+        return true;
     }
 
     public async Task DeleteTourLogAsync(int id)
@@ -58,8 +89,6 @@ public class TourLogService : ITourLogService
         {
             int tourId = tourLog.TourId;
             await _tourLogRepository.DeleteTourLogAsync(id);
-            
-            // Update computed fields on the parent tour
             await RecalculateTourScoresAsync(tourId);
         }
     }
@@ -75,18 +104,12 @@ public class TourLogService : ITourLogService
 
         if (logs.Any())
         {
-            double avgDifficulty = logs.Average(l => l.Difficulty);
-            double avgTime = logs.Average(l => l.TotalTime);
-            double avgDistance = logs.Average(l => (double)l.TotalDistance);
+            double avgDifficulty = logs.Average(l => l.Difficulty); 
+            double avgTime = logs.Average(l => l.TotalTime);        
+            double avgDistance = logs.Average(l => (double)l.TotalDistance); 
 
-            // Higher score = more child friendly. Custom example formula out of 100 max:
-            // High difficulty penalty
             double diffScore = Math.Max(0, 100 - (avgDifficulty * 20)); 
-            
-            // Long time penalty (loses 1 point per hour/60 mins)
             double timeScore = Math.Max(0, 100 - (avgTime / 60.0)); 
-            
-            // Long distance penalty (loses 1 pt per km)
             double distanceScore = Math.Max(0, 100 - (avgDistance)); 
             
             tour.ComputedChildFriendlyScore = (decimal)((diffScore + timeScore + distanceScore) / 3.0);

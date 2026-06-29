@@ -1,3 +1,4 @@
+namespace TourPlannerAPI.DTOs;
 public class CreateTourDto
 {
     public int UserId { get; set; }

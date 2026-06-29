@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.Models;
+using TourPlannerAPI.DTOs;
+using TourPlannerAPI.Services;
+
+namespace TourPlannerAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -30,17 +34,20 @@ public class TourLogsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddTourLog(TourLog tourLog)
+    public async Task<ActionResult<TourLog>> AddTourLog(CreateTourLogDto dto)
     {
-        await _tourLogService.AddTourLogAsync(tourLog);
-        return CreatedAtAction(nameof(GetTourLogById), new { id = tourLog.Id }, tourLog);
+        var createdLog = await _tourLogService.AddTourLogAsync(dto);
+        
+        return CreatedAtAction(nameof(GetTourLogById), new { id = createdLog.Id }, createdLog);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTourLog(int id, TourLog tourLog)
+    public async Task<IActionResult> UpdateTourLog(int id, CreateTourLogDto dto)
     {
-        if (id != tourLog.Id) return BadRequest();
-        await _tourLogService.UpdateTourLogAsync(tourLog);
+        var updated = await _tourLogService.UpdateTourLogAsync(id, dto);
+        
+        if (!updated) return NotFound();
+
         return NoContent();
     }
 

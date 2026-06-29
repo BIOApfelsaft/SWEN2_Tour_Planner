@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.Models;
+using TourPlannerAPI.DTOs;
+
 
 [ApiController]
 [Route("api/[controller]")]
