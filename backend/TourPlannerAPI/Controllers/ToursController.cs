@@ -32,25 +32,8 @@ public class TourController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Tour>> CreateTour(CreateTourDto dto)
     {
-        var tour = new Tour
-        {
-            UserId = dto.UserId,
-            Title = dto.Title,
-            Description = dto.Description,
-            StartLocation = dto.StartLocation,
-            EndLocation = dto.EndLocation,
-            TransportType = dto.TransportType,
-            Distance = dto.Distance,
-            EstimatedTime = dto.EstimatedTime,
-            MapImagePath = dto.MapImagePath,
-            RouteGeojson = dto.RouteGeojson,
-            ComputedPopularityScore = 0,
-            ComputedChildFriendlyScore = 0,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-
-        var createdTour = await _tourService.CreateTourAsync(tour);
+        var createdTour = await _tourService.CreateTourAsync(dto);
+        
         return CreatedAtAction(nameof(GetTourById), new { id = createdTour.Id }, createdTour);
     }
 

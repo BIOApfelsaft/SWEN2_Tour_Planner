@@ -54,6 +54,8 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+builder.Services.AddHttpClient<OpenRouteServiceClient>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
