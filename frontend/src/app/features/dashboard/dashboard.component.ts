@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { StatisticCardComponent } from '../../components/statistic-card/statistic-card.component';
 import { TourCardComponent } from '../../components/tour-card/tour-card.component';
 import { DashboardStatistic } from '../../models/stat.model';
@@ -10,7 +10,8 @@ import { StatsService } from '../../services/stats.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [StatisticCardComponent, TourCardComponent],
-  templateUrl: './dashboard.component.html' 
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
   private tourService = inject(TourService);
@@ -18,7 +19,7 @@ export class DashboardComponent implements OnInit {
 
   statistics = signal<DashboardStatistic[]>([]);
   plannedTours = signal<Tour[]>([]);
-  
+
   ngOnInit(): void {
     this.loadData();
   }
@@ -30,7 +31,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load stats', err);
-      }
+      },
     });
 
     this.tourService.getTours().subscribe({
@@ -39,7 +40,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load tours', err);
-      }
+      },
     });
   }
 }

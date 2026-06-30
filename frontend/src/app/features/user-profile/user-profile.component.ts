@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
@@ -11,7 +11,8 @@ import { InputComponent } from '../../components/input/input.component';
   selector: 'app-user-profile',
   standalone: true,
   imports: [ReactiveFormsModule, DecimalPipe, InputComponent, ButtonComponent],
-  templateUrl: './user-profile.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './user-profile.component.html',
 })
 export class UserProfileComponent implements OnInit {
   private userService = inject(UserService);
@@ -19,7 +20,7 @@ export class UserProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   user = signal<User | null>(null);
-  
+
   totalDistance = signal<number>(0);
   totalLogs = signal<number>(0);
   totalTime = signal<number>(0);
@@ -28,19 +29,19 @@ export class UserProfileComponent implements OnInit {
   profileForm = this.fb.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    password: ['********']
+    password: ['********'],
   });
 
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe(u => {
+    this.userService.getCurrentUser().subscribe((u) => {
       this.user.set(u);
       this.profileForm.patchValue({
         name: u.name,
-        email: u.email
+        email: u.email,
       });
     });
 
-    this.tourLogService.getAllLogsForUserId(1).subscribe(logs => {
+    this.tourLogService.getAllLogsForUserId(1).subscribe((logs) => {
       this.totalLogs.set(logs.length);
       const distance = logs.reduce((sum, log) => sum + log.totalDistance, 0);
       this.totalDistance.set(distance);
@@ -54,10 +55,10 @@ export class UserProfileComponent implements OnInit {
       this.isSaving.set(true);
       const updatedData = {
         name: this.profileForm.value.name!,
-        email: this.profileForm.value.email!
+        email: this.profileForm.value.email!,
       };
 
-      this.userService.updateUser(updatedData).subscribe(updatedUser => {
+      this.userService.updateUser(updatedData).subscribe((updatedUser) => {
         this.user.set(updatedUser);
         this.isSaving.set(false);
         this.profileForm.patchValue({ password: '********' });

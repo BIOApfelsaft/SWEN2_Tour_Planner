@@ -1,20 +1,21 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-rating-display',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex items-center text-amber-500" [title]="'Rating: ' + rating() + ' / 5'">
       @for (star of stars(); track $index) {
-        
-        <span class="material-symbols-outlined text-[18px]" 
-              [style.font-variation-settings]="star.fontStyle">
+        <span
+          class="material-symbols-outlined text-[18px]"
+          [style.font-variation-settings]="star.fontStyle"
+        >
           {{ star.icon }}
         </span>
-        
       }
     </div>
-  `
+  `,
 })
 export class RatingDisplayComponent {
   rating = input.required<number>();
@@ -22,7 +23,7 @@ export class RatingDisplayComponent {
   stars = computed(() => {
     const r = this.rating();
     const starsArray = [];
-    
+
     for (let i = 1; i <= 5; i++) {
       if (r >= i) {
         // Full star

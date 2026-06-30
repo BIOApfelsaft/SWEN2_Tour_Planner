@@ -1,4 +1,12 @@
-import { Component, signal, inject, OnInit, effect, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  effect,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tour } from '../../models/tour.model';
 import { TourLog } from '../../models/tour-log.model';
@@ -15,8 +23,16 @@ import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.componen
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [DecimalPipe, TourLogCardComponent, TourMapComponent, WeatherWidgetComponent, ButtonComponent, TourLogModalComponent],
-  templateUrl: './tour-detail.component.html'
+  imports: [
+    DecimalPipe,
+    TourLogCardComponent,
+    TourMapComponent,
+    WeatherWidgetComponent,
+    ButtonComponent,
+    TourLogModalComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './tour-detail.component.html',
 })
 export class TourDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -27,14 +43,14 @@ export class TourDetailComponent implements OnInit, OnDestroy {
 
   tour = signal<Tour | null>(null);
   logs = signal<TourLog[]>([]);
-  
+
   isAddingLog = signal<Boolean>(false);
   selectedLogToEdit = signal<TourLog | null>(null);
 
   isLoading = signal<Boolean>(true);
 
   constructor() {
-    // effect init map when tour data is loaded 
+    // effect init map when tour data is loaded
     effect(() => {
       if (!this.isLoading() && this.tour()) {
         setTimeout(() => {
@@ -59,7 +75,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
           this.tour.set(tourData);
         }
       },
-      error: (err) => console.error('Error loading tour profile', err)
+      error: (err) => console.error('Error loading tour profile', err),
     });
 
     // Fetch the tracking history logs
@@ -71,7 +87,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error loading tour logs', err);
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
@@ -85,8 +101,10 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   deleteTour() {
     const currentTour = this.tour();
     if (currentTour) {
-      const isConfirmed = confirm(`Are you sure you want to delete the tour "${currentTour.title}"?`);
-      
+      const isConfirmed = confirm(
+        `Are you sure you want to delete the tour "${currentTour.title}"?`,
+      );
+
       if (isConfirmed) {
         this.tourService.deleteTour(currentTour.id).subscribe(() => {
           this.router.navigate(['/']);
@@ -101,7 +119,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   }
 
   handleEditLog(log: TourLog) {
-    this.selectedLogToEdit.set(log); 
+    this.selectedLogToEdit.set(log);
     this.isAddingLog.set(true);
   }
 
@@ -113,18 +131,18 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   saveLog(logData: any) {
     if (logData.id) {
       // UPDATE: If an ID exists, we update the existing log
-      this.tourLogService.updateLog(logData.id, logData).subscribe(updatedLog => {
+      this.tourLogService.updateLog(logData.id, logData).subscribe((updatedLog) => {
         if (updatedLog) {
-          this.logs.update(currentLogs => 
-            currentLogs.map(l => l.id === updatedLog.id ? updatedLog : l)
+          this.logs.update((currentLogs) =>
+            currentLogs.map((l) => (l.id === updatedLog.id ? updatedLog : l)),
           );
         }
         this.closeLogModal();
       });
     } else {
       // CREATE: If no ID exists, we create a new log
-      this.tourLogService.addLog(logData).subscribe(savedLog => {
-        this.logs.update(currentLogs => [savedLog, ...currentLogs]);
+      this.tourLogService.addLog(logData).subscribe((savedLog) => {
+        this.logs.update((currentLogs) => [savedLog, ...currentLogs]);
         this.closeLogModal();
       });
     }
@@ -132,7 +150,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
 
   handleDeleteLog(log: TourLog) {
     this.tourLogService.deleteLog(log.id).subscribe(() => {
-      this.logs.update(currentLogs => currentLogs.filter(l => l.id !== log.id));
+      this.logs.update((currentLogs) => currentLogs.filter((l) => l.id !== log.id));
     });
   }
 

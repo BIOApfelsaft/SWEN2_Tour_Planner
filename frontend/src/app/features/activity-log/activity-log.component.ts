@@ -1,4 +1,11 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { TourLogService } from '../../services/tour-log.service';
 import { TourService } from '../../services/tour.service';
@@ -17,8 +24,15 @@ export interface EnrichedTourLog extends TourLog {
 @Component({
   selector: 'app-activity-log',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RatingDisplayComponent, DifficultyIndicatorComponent, TourLogModalComponent],
-  templateUrl: './activity-log.component.html'
+  imports: [
+    DatePipe,
+    DecimalPipe,
+    RatingDisplayComponent,
+    DifficultyIndicatorComponent,
+    TourLogModalComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './activity-log.component.html',
 })
 export class ActivityLogComponent implements OnInit {
   private tourLogService = inject(TourLogService);
@@ -33,22 +47,22 @@ export class ActivityLogComponent implements OnInit {
 
   enrichedLogs = computed<EnrichedTourLog[]>(() => {
     const allTours = this.tours();
-    return this.rawLogs().map(log => {
-      const tour = allTours.find(t => t.id === log.tourId);
+    return this.rawLogs().map((log) => {
+      const tour = allTours.find((t) => t.id === log.tourId);
       return {
         ...log,
         tourTitle: tour?.title || 'Unknown Tour',
         tourLocation: tour?.startLocation || 'Unknown Location',
-        transportType: tour?.transportType || 'Hiking'
+        transportType: tour?.transportType || 'Hiking',
       };
     });
   });
 
   ngOnInit() {
-    this.tourService.getTours().subscribe(tours => {
+    this.tourService.getTours().subscribe((tours) => {
       this.tours.set(tours);
-      
-      this.tourLogService.getAllLogsForUserId(1).subscribe(logs => {
+
+      this.tourLogService.getAllLogsForUserId(1).subscribe((logs) => {
         this.rawLogs.set(logs);
       });
     });
@@ -61,7 +75,7 @@ export class ActivityLogComponent implements OnInit {
   }
 
   editLog(log: EnrichedTourLog) {
-    const tour = this.tours().find(t => t.id === log.tourId);
+    const tour = this.tours().find((t) => t.id === log.tourId);
     if (tour) {
       this.selectedTourForEdit.set(tour);
       this.selectedLogToEdit.set(log as TourLog);
@@ -72,15 +86,15 @@ export class ActivityLogComponent implements OnInit {
   deleteLog(logId: number) {
     if (confirm('Are you sure you want to delete this activity?')) {
       this.tourLogService.deleteLog(logId).subscribe(() => {
-        this.rawLogs.update(logs => logs.filter(l => l.id !== logId));
+        this.rawLogs.update((logs) => logs.filter((l) => l.id !== logId));
       });
     }
   }
 
   saveUpdatedLog(updatedLogData: any) {
-    this.tourLogService.updateLog(updatedLogData.id, updatedLogData).subscribe(savedLog => {
+    this.tourLogService.updateLog(updatedLogData.id, updatedLogData).subscribe((savedLog) => {
       if (savedLog) {
-        this.rawLogs.update(logs => logs.map(l => l.id === savedLog.id ? savedLog : l));
+        this.rawLogs.update((logs) => logs.map((l) => (l.id === savedLog.id ? savedLog : l)));
       }
       this.isEditModalOpen.set(false);
     });

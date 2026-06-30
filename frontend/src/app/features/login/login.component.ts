@@ -1,5 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../components/button/button.component';
 import { InputComponent } from '../../components/input/input.component';
@@ -10,7 +16,8 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [ReactiveFormsModule, ButtonComponent, InputComponent, FooterComponent],
-  templateUrl: './login.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './login.component.html',
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -22,21 +29,24 @@ export class LoginComponent {
   isLoading = signal<boolean>(false);
 
   loginForm = this.fb.group({
-    username: ['', [Validators.required]], 
-    password: ['', [Validators.required]]
+    username: ['', [Validators.required]],
+    password: ['', [Validators.required]],
   });
 
-  registerForm = this.fb.group({
-    username: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    passwordRepeat: ['', [Validators.required]]
-  }, { validators: this.passwordMatchValidator });
+  registerForm = this.fb.group(
+    {
+      username: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      passwordRepeat: ['', [Validators.required]],
+    },
+    { validators: this.passwordMatchValidator },
+  );
 
   private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const passwordRepeat = control.get('passwordRepeat')?.value;
-    
+
     if (password && passwordRepeat && password !== passwordRepeat) {
       control.get('passwordRepeat')?.setErrors({ mismatch: true });
       return { mismatch: true };
@@ -74,9 +84,11 @@ export class LoginComponent {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        this.apiErrorMessage.set(err.error?.message || err.error || 'Login failed. Please check your credentials.');
+        this.apiErrorMessage.set(
+          err.error?.message || err.error || 'Login failed. Please check your credentials.',
+        );
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
@@ -87,8 +99,13 @@ export class LoginComponent {
     }
 
     this.isLoading.set(true);
-    const { passwordRepeat, ...registerData } = this.registerForm.value as { username: string; email: string; password: string; passwordRepeat: string };
-    
+    const { passwordRepeat, ...registerData } = this.registerForm.value as {
+      username: string;
+      email: string;
+      password: string;
+      passwordRepeat: string;
+    };
+
     this.authService.register(registerData).subscribe({
       next: () => {
         this.isLoading.set(false);
@@ -97,7 +114,7 @@ export class LoginComponent {
       error: (err) => {
         this.apiErrorMessage.set(err.error?.message || err.error || 'Registration failed.');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 }

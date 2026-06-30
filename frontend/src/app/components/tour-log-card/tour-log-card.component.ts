@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { TourLog } from '../../models/tour-log.model';
 import { RatingDisplayComponent } from '../rating-display/rating-display.component';
@@ -8,11 +8,12 @@ import { DifficultyIndicatorComponent } from '../difficulty-display/difficulty-d
   selector: 'app-tour-log-card',
   standalone: true,
   imports: [DatePipe, DecimalPipe, RatingDisplayComponent, DifficultyIndicatorComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tour-log-card.component.html',
 })
 export class TourLogCardComponent {
   log = input.required<TourLog>();
-  
+
   edit = output<TourLog>();
   delete = output<TourLog>();
 
