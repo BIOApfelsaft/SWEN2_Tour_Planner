@@ -78,8 +78,7 @@ export class LoginComponent {
     this.isLoading.set(true);
     const loginData = this.loginForm.value as { username: string; password: string };
     this.authService.login(loginData).subscribe({
-      next: (res) => {
-        localStorage.setItem('authToken', res.token);
+      next: () => {
         this.isLoading.set(false);
         this.router.navigate(['/']);
       },

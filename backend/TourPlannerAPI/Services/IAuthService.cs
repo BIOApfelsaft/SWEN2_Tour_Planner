@@ -1,8 +1,10 @@
-using System.Threading.Tasks;
-using TourPlannerAPI.DTOs;
+using TourPlannerAPI.DTOs.Auth;
 
-public interface IAuthService
+namespace TourPlannerAPI.Services
 {
-    Task<bool> RegisterAsync(RegisterDto dto);
-    Task<string?> LoginAsync(LoginDto dto);
+    public interface IAuthService
+    {
+        Task<bool> RegisterAsync(RegisterRequest dto);
+        Task<string?> LoginAsync(LoginRequest dto);
+    }
 }
