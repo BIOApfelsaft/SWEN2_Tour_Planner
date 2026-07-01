@@ -7,13 +7,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { User } from '../../models/user';
+import { UserResponse } from '../../models/user-response';
 
-export interface ApiUserGet$Json$Params {
+export interface ApiUserMeGet$Json$Params {
 }
 
-export function apiUserGet$Json(http: HttpClient, rootUrl: string, params?: ApiUserGet$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<User>>> {
-  const rb = new RequestBuilder(rootUrl, apiUserGet$Json.PATH, 'get');
+export function apiUserMeGet$Json(http: HttpClient, rootUrl: string, params?: ApiUserMeGet$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
+  const rb = new RequestBuilder(rootUrl, apiUserMeGet$Json.PATH, 'get');
   if (params) {
   }
 
@@ -22,9 +22,9 @@ export function apiUserGet$Json(http: HttpClient, rootUrl: string, params?: ApiU
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<User>>;
+      return r as StrictHttpResponse<UserResponse>;
     })
   );
 }
 
-apiUserGet$Json.PATH = '/api/User';
+apiUserMeGet$Json.PATH = '/api/User/me';

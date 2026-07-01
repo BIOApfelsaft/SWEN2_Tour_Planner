@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@ang
 import { LayoutService } from '../../services/layout.service';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { User } from '../../models/user.model';
+import { UserResponse } from '../../api/models/user-response';
 import { ButtonComponent } from '../button/button.component';
 import { AuthService } from '../../services/auth.service';
 
@@ -45,13 +45,20 @@ import { AuthService } from '../../services/auth.service';
           @if (user(); as currentUser) {
             <a
               routerLink="/profile"
-              class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden hover:border-primary transition-colors cursor-pointer block shrink-0"
+              class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden hover:border-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center bg-white/5"
+              aria-label="Open profile"
             >
-              <img
-                [src]="currentUser.avatarUrl"
-                [alt]="currentUser.name"
-                class="w-full h-full object-cover"
-              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 text-primary"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"
+                />
+              </svg>
             </a>
           }
         </div>
@@ -69,9 +76,9 @@ export class HeaderComponent implements OnInit {
   layoutService = inject(LayoutService);
   userService = inject(UserService);
   authService = inject(AuthService);
-  user = signal<User | null>(null);
+  user = signal<UserResponse | null>(null);
 
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe((u) => this.user.set(u));
+    this.userService.getCurrentUser().then((u) => this.user.set(u));
   }
 }

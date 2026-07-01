@@ -7,26 +7,23 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { User } from '../../models/user';
 
-export interface ApiUserPost$Json$Params {
-      body: User
+export interface ApiUserMeDelete$Params {
 }
 
-export function apiUserPost$Json(http: HttpClient, rootUrl: string, params: ApiUserPost$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<User>> {
-  const rb = new RequestBuilder(rootUrl, apiUserPost$Json.PATH, 'post');
+export function apiUserMeDelete(http: HttpClient, rootUrl: string, params?: ApiUserMeDelete$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, apiUserMeDelete.PATH, 'delete');
   if (params) {
-    rb.body(params.body, 'application/*+json');
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'text/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<User>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }
 
-apiUserPost$Json.PATH = '/api/User';
+apiUserMeDelete.PATH = '/api/User/me';

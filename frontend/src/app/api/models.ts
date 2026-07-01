@@ -11,3 +11,5 @@ export type { RegisterResponse } from './models/register-response';
 export type { Tour } from './models/tour';
 export type { TourLog } from './models/tour-log';
 export type { User } from './models/user';
+export type { UserResponse } from './models/user-response';
+export type { UserUpdateRequest } from './models/user-update-request';

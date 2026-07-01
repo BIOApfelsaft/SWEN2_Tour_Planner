@@ -1,57 +1,60 @@
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.Models;
+using TourPlannerAPI.DTOs.Users;
 using TourPlannerAPI.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TourPlannerAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    [Route("api/[controller]/me")]
+    [Authorize]
+    public class UserController(IUserService userService) : ControllerBase
     {
-        private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
+        private readonly IUserService _userService = userService;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+        public async Task<ActionResult<UserResponse>> GetMyProfile()
         {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var user = await _userService.GetUserByIdAsync(userId);
+            
+            if (user == null) return NotFound();
+
+            return Ok(new UserResponse 
+            { 
+                Id = user.Id, 
+                Username = user.Username, 
+                Email = user.Email 
+            });
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        [HttpPut]
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UserUpdateRequest dto)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound();
-            return Ok(user);
-        }
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var user = await _userService.GetUserByIdAsync(userId);
+            
+            if (user == null) return NotFound();
 
-        [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-            var createdUser = await _userService.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
-        {
-            if (id != user.Id)
-                return BadRequest();
+            user.Username = dto.Username;
+            user.Email = dto.Email;
+            user.PasswordHash = dto.PasswordHash;
 
             await _userService.UpdateUserAsync(user);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMyProfile()
         {
-            await _userService.DeleteUserAsync(id);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var user = await _userService.GetUserByIdAsync(userId);
+            
+            if (user == null) return NotFound();
+
+            await _userService.DeleteUserAsync(userId);
             return NoContent();
         }
     }

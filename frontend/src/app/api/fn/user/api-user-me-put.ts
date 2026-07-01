@@ -7,15 +7,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { UserUpdateRequest } from '../../models/user-update-request';
 
-export interface ApiUserIdDelete$Params {
-  id: (number | string);
+export interface ApiUserMePut$Params {
+      body: UserUpdateRequest
 }
 
-export function apiUserIdDelete(http: HttpClient, rootUrl: string, params: ApiUserIdDelete$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, apiUserIdDelete.PATH, 'delete');
+export function apiUserMePut(http: HttpClient, rootUrl: string, params: ApiUserMePut$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, apiUserMePut.PATH, 'put');
   if (params) {
-    rb.path('id', params.id, {});
+    rb.body(params.body, 'application/*+json');
   }
 
   return http.request(
@@ -28,4 +29,4 @@ export function apiUserIdDelete(http: HttpClient, rootUrl: string, params: ApiUs
   );
 }
 
-apiUserIdDelete.PATH = '/api/User/{id}';
+apiUserMePut.PATH = '/api/User/me';
