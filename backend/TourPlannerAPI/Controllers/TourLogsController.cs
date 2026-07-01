@@ -9,14 +9,9 @@ namespace TourPlannerAPI.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class TourLogsController : ControllerBase
+public class TourLogsController(ITourLogService tourLogService) : ControllerBase
 {
-    private readonly ITourLogService _tourLogService;
-
-    public TourLogsController(ITourLogService tourLogService)
-    {
-        _tourLogService = tourLogService;
-    }
+    private readonly ITourLogService _tourLogService = tourLogService;
 
     [HttpGet("tour/{tourId}")]
     public async Task<ActionResult<IEnumerable<TourLog>>> GetTourLogs(int tourId)

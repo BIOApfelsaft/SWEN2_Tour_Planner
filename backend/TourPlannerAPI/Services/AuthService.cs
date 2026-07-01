@@ -5,32 +5,61 @@ using System.Text;
 using TourPlannerAPI.Data;
 using TourPlannerAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Security.Cryptography;
 
 namespace TourPlannerAPI.Services
 {
-    public class AuthService(AppDbContext db, IConfiguration config) : IAuthService
+    public class AuthService(AppDbContext db, IConfiguration config, IMemoryCache cache) : IAuthService
     {
         private readonly AppDbContext _db = db;
         private readonly IConfiguration _config = config;
+        private readonly IMemoryCache _cache = cache;
 
         public async Task<bool> RegisterAsync(User user, string rawPassword)
         {
             if (await _db.Users.AnyAsync(u => u.Username == user.Username))
                 return false;
     
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(rawPassword);
+            user.PasswordHash = ComputeSha256(rawPassword);
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
             return true;
         }
 
-        public async Task<string?> LoginAsync(string username, string password)
+        public string GenerateChallenge(string username)
         {
+            var challenge = Guid.NewGuid().ToString("N");
+            
+            // Save challenge in cache with 2 minutes expiration time
+            _cache.Set(username, challenge, TimeSpan.FromMinutes(2));
+            
+            return challenge;
+        }
+
+        public async Task<string?> LoginWithChallengeAsync(string username, string clientResponse)
+        {
+            if (!_cache.TryGetValue(username, out string? activeChallenge))
+                return null;
+
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            if (user == null) return null;
+
+            var expectedResponse = ComputeSha256(user.PasswordHash + activeChallenge);
+
+            _cache.Remove(username);
+            if (expectedResponse != clientResponse)
                 return null;
 
             return GenerateToken(user);
+        }
+
+        public static string ComputeSha256(string rawData)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
+            var builder = new StringBuilder();
+            foreach (var b in bytes) builder.Append(b.ToString("x2"));
+            return builder.ToString();
         }
 
         private string GenerateToken(User user)

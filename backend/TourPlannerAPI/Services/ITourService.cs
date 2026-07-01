@@ -1,13 +1,14 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.DTOs;
 
-public interface ITourService
+namespace TourPlannerAPI.Services
 {
-    Task<IEnumerable<Tour>> GetAllToursAsync();
-    Task<Tour?> GetTourByIdAsync(int id);
-    Task<Tour> CreateTourAsync(CreateTourDto dto);
-    Task UpdateTourAsync(Tour tour);
-    Task DeleteTourAsync(int id);
+    public interface ITourService
+    {
+        Task<IEnumerable<Tour>> GetAllToursAsync();
+        Task<Tour?> GetTourByIdAsync(int id);
+        Task<Tour> CreateTourAsync(CreateTourDto dto);
+        Task UpdateTourAsync(Tour tour);
+        Task DeleteTourAsync(int id);
+    }
 }

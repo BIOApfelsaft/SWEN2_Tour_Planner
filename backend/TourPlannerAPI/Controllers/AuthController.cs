@@ -7,16 +7,10 @@ namespace TourPlannerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService authService, ILogger<AuthController> logger) : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
-
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
-        {
-            _authService = authService;
-            _logger = logger;
-        }
+        private readonly IAuthService _authService = authService;
+        private readonly ILogger<AuthController> _logger = logger;
 
         [HttpPost("register")]
         public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest dto)
@@ -36,12 +30,19 @@ namespace TourPlannerAPI.Controllers
             return Ok(new RegisterResponse { Message = "Registered successfully." });
         }
 
+        [HttpGet("challenge/{username}")]
+        public ActionResult<ChallengeResponse> GetChallenge(string username)
+        {
+            var challenge = _authService.GenerateChallenge(username);
+            return Ok(new ChallengeResponse { Challenge = challenge });
+        }
+
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest dto)
         {
             _logger.LogInformation("User login attempt with username: {Username}", dto.Username);
             
-            var token = await _authService.LoginAsync(dto.Username, dto.Password);
+            var token = await _authService.LoginWithChallengeAsync(dto.Username, dto.Password);
             
             if (token == null) return Unauthorized("Invalid credentials.");
             

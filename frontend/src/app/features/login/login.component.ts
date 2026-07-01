@@ -77,18 +77,18 @@ export class LoginComponent {
 
     this.isLoading.set(true);
     const loginData = this.loginForm.value as { username: string; password: string };
-    this.authService.login(loginData).subscribe({
-      next: () => {
+    
+    this.authService.login(loginData)
+      .then(() => {
         this.isLoading.set(false);
         this.router.navigate(['/']);
-      },
-      error: (err) => {
+      })
+      .catch((err) => {
         this.apiErrorMessage.set(
-          err.error?.message || err.error || 'Login failed. Please check your credentials.',
+          err.error?.message || err.error || err.message || 'Login failed. Please check your credentials.'
         );
         this.isLoading.set(false);
-      },
-    });
+      });
   }
 
   private handleRegistration(): void {
@@ -98,22 +98,19 @@ export class LoginComponent {
     }
 
     this.isLoading.set(true);
-    const { passwordRepeat, ...registerData } = this.registerForm.value as {
-      username: string;
-      email: string;
-      password: string;
-      passwordRepeat: string;
-    };
+    
+    const { passwordRepeat, ...registerData } = this.registerForm.value as any;
 
-    this.authService.register(registerData).subscribe({
-      next: () => {
+    this.authService.register(registerData)
+      .then(() => {
         this.isLoading.set(false);
-        this.setMode(true); // Switch to login mode upon successful registration
-      },
-      error: (err) => {
-        this.apiErrorMessage.set(err.error?.message || err.error || 'Registration failed.');
+        this.setMode(true);
+      })
+      .catch((err) => {
+        this.apiErrorMessage.set(
+          err.error?.message || err.error || err.message || 'Registration failed.'
+        );
         this.isLoading.set(false);
-      },
-    });
+      });
   }
 }

@@ -1,23 +1,17 @@
 using TourPlannerAPI.Models;
 using TourPlannerAPI.DTOs;
+using TourPlannerAPI.Repositories;
 
 namespace TourPlannerAPI.Services;
 
-public class TourLogService : ITourLogService
+public class TourLogService(
+    ILogger<TourLogService> logger,
+    ITourLogRepository tourLogRepository,
+    ITourRepository tourRepository) : ITourLogService
 {
-    private readonly ILogger<TourLogService> _logger;
-    private readonly ITourLogRepository _tourLogRepository;
-    private readonly ITourRepository _tourRepository;
-
-    public TourLogService(
-        ILogger<TourLogService> logger, 
-        ITourLogRepository tourLogRepository, 
-        ITourRepository tourRepository)
-    {
-        _logger = logger;
-        _tourLogRepository = tourLogRepository;
-        _tourRepository = tourRepository;
-    }
+    private readonly ILogger<TourLogService> _logger = logger;
+    private readonly ITourLogRepository _tourLogRepository = tourLogRepository;
+    private readonly ITourRepository _tourRepository = tourRepository;
 
     public async Task<IEnumerable<TourLog>> GetTourLogsAsync(int tourId)
     {

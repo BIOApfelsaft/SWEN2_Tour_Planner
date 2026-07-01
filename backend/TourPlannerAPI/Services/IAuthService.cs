@@ -5,6 +5,9 @@ namespace TourPlannerAPI.Services
     public interface IAuthService
     {
         Task<bool> RegisterAsync(User user, string rawPassword);
-        Task<string?> LoginAsync(string username, string password);
+
+        string GenerateChallenge(string username);
+
+        Task<string?> LoginWithChallengeAsync(string username, string clientResponse);
     }
 }
