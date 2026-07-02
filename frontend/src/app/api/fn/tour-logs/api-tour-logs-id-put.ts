@@ -7,11 +7,11 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateTourLogDto } from '../../models/create-tour-log-dto';
+import { CreateTourLogRequest } from '../../models/create-tour-log-request';
 
 export interface ApiTourLogsIdPut$Params {
   id: (number | string);
-      body: CreateTourLogDto
+      body: CreateTourLogRequest
 }
 
 export function apiTourLogsIdPut(http: HttpClient, rootUrl: string, params: ApiTourLogsIdPut$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {

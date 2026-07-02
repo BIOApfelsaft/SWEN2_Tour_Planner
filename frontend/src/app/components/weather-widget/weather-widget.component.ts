@@ -4,7 +4,7 @@ import { WeatherService, WeatherData } from '../../services/weather.service';
 @Component({
   selector: 'app-weather-widget',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (weather(); as w) {
       <span

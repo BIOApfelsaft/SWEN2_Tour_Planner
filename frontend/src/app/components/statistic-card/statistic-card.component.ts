@@ -4,7 +4,7 @@ import { DashboardStatistic } from '../../models/stat.model';
 @Component({
   selector: 'app-statistic-card',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant/30 flex flex-col gap-sm"

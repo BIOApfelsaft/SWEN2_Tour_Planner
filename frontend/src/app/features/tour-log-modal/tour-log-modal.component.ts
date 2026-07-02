@@ -17,7 +17,8 @@ import {
 import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { WeatherService, WeatherData } from '../../services/weather.service';
-import { TourLog } from '../../models/tour-log.model';
+import { TourLogResponse } from '../../api/models/tour-log-response';
+import { CreateTourLogRequest } from '../../api/models/create-tour-log-request';
 import { RatingDisplayComponent } from '../../components/rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../../components/difficulty-display/difficulty-display.component';
 
@@ -53,7 +54,7 @@ export function dateRangeValidator(control: AbstractControl): ValidationErrors |
     RatingDisplayComponent,
     DifficultyIndicatorComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tour-log-modal.component.html',
 })
 export class TourLogModalComponent implements OnInit {
@@ -63,11 +64,11 @@ export class TourLogModalComponent implements OnInit {
   location = input<string>('');
 
   // Optional log for Edit Mode
-  log = input<TourLog | null>(null);
+  log = input<TourLogResponse | null>(null);
 
   // Outputs to the Parent
   closeModal = output<void>();
-  saveLog = output<any>();
+  saveLog = output<CreateTourLogRequest & { id?: number }>();
 
   private fb = inject(FormBuilder);
   private weatherService = inject(WeatherService);
@@ -94,22 +95,22 @@ export class TourLogModalComponent implements OnInit {
 
     if (existingLog) {
       // Setup Edit Mode
-      const startDateObj = new Date(existingLog.logDateTime);
-      const endDateObj = new Date(startDateObj.getTime() + existingLog.totalTime * 1000);
+      const startDateObj = new Date(Number(existingLog.logDateTime));
+      const endDateObj = new Date(startDateObj.getTime() + Number(existingLog.totalTime) * 1000);
 
       this.logForm.patchValue({
         startDate: startDateObj.toISOString().split('T')[0],
         startTime: startDateObj.toTimeString().substring(0, 5),
         endDate: endDateObj.toISOString().split('T')[0],
         endTime: endDateObj.toTimeString().substring(0, 5),
-        distance: existingLog.totalDistance,
-        difficulty: existingLog.difficulty,
-        rating: existingLog.rating,
+        distance: Number(existingLog.totalDistance),
+        difficulty: Number(existingLog.difficulty),
+        rating: Number(existingLog.rating),
         comment: existingLog.comment,
       });
 
       this.fetchedWeather = {
-        temperature: existingLog.temperature || 0,
+        temperature: Number(existingLog.temperature) || 0,
         condition: existingLog.weatherCondition || 'Unknown',
         icon: 'cloud',
       };
@@ -145,11 +146,11 @@ export class TourLogModalComponent implements OnInit {
 
       if (diffInSeconds < 0) diffInSeconds = 0;
 
-      const finalLogData = {
-        id: existingLog ? existingLog.id : undefined,
+      const finalLogData: CreateTourLogRequest & { id?: number } = {
+        id: Number(existingLog ? existingLog.id : undefined),
         tourId: this.tourId(),
         logDateTime: start.toISOString(),
-        comment: formValues.comment,
+        comment: formValues.comment || '',
         difficulty: Number(formValues.difficulty),
         rating: Number(formValues.rating),
         totalDistance: Number(formValues.distance),

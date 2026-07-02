@@ -1,5 +1,4 @@
 using TourPlannerAPI.Models;
-using TourPlannerAPI.DTOs;
 using TourPlannerAPI.Repositories;
 
 namespace TourPlannerAPI.Services;
@@ -25,38 +24,80 @@ public class TourService(
         return await _tourRepository.GetTourByIdAsync(id);
     }
 
-    public async Task<Tour> CreateTourAsync(CreateTourDto dto)
+    public async Task<Tour> CreateTourAsync(Tour tour, double startLng, double startLat, double endLng, double endLat)
     {
         _logger.LogInformation("Creating new tour and fetching ORS route.");
-        var routeData = await _orsClient.GetRouteDataAsync(
-            dto.StartLng, dto.StartLat, dto.EndLng, dto.EndLat, dto.TransportType);
-
-        var tour = new Tour
+        
+        if (startLng == 0 && startLat == 0)
         {
-            UserId = dto.UserId,
-            Title = dto.Title,
-            Description = dto.Description,
-            StartLocation = dto.StartLocation,
-            EndLocation = dto.EndLocation,
-            TransportType = dto.TransportType,
-            Distance = routeData.distance,   
-            EstimatedTime = routeData.time,  
-            MapImagePath = dto.MapImagePath,
-            RouteGeojson = routeData.geoJson,
-            ComputedPopularityScore = 0,
-            ComputedChildFriendlyScore = 0,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+            var (Lng, Lat) = await _orsClient.GetCoordinatesAsync(tour.StartLocation);
+            startLng = Lng;
+            startLat = Lat;
+        }
+
+        if (endLng == 0 && endLat == 0)
+        {
+            var (Lng, Lat) = await _orsClient.GetCoordinatesAsync(tour.EndLocation);
+            endLng = Lng;
+            endLat = Lat;
+        }
+
+        var (distance, time, geoJson) = await _orsClient.GetRouteDataAsync(startLng, startLat, endLng, endLat, tour.TransportType);
+
+        tour.Distance = distance;   
+        tour.EstimatedTime = time;  
+        tour.RouteGeojson = geoJson;
+        tour.ComputedPopularityScore = 0;
+        tour.ComputedChildFriendlyScore = 0;
+        tour.CreatedAt = DateTime.Now;
+        tour.UpdatedAt = DateTime.Now;
 
         return await _tourRepository.CreateTourAsync(tour);
     }
 
-    public async Task UpdateTourAsync(Tour tour)
+    public async Task<Tour?> UpdateTourAsync(int id, Tour updatedData, double startLng, double startLat, double endLng, double endLat)
     {
-        _logger.LogInformation("Updating tour.");
-        tour.UpdatedAt = DateTime.UtcNow;
-        await _tourRepository.UpdateTourAsync(tour);
+        var existingTour = await _tourRepository.GetTourByIdAsync(id);
+        if (existingTour == null) return null;
+
+        bool routeChanged = existingTour.StartLocation != updatedData.StartLocation ||
+                            existingTour.EndLocation != updatedData.EndLocation ||
+                            existingTour.TransportType != updatedData.TransportType;
+
+        if (routeChanged)
+        {
+            _logger.LogInformation("Route details changed. Recalculating ORS route...");
+            
+            if (startLng == 0 && startLat == 0)
+            {
+                var (Lng, Lat) = await _orsClient.GetCoordinatesAsync(updatedData.StartLocation);
+                startLng = Lng;
+                startLat = Lat;
+            }
+            if (endLng == 0 && endLat == 0)
+            {
+                var (Lng, Lat) = await _orsClient.GetCoordinatesAsync(updatedData.EndLocation);
+                endLng = Lng;
+                endLat = Lat;
+            }
+
+            var (distance, time, geoJson) = await _orsClient.GetRouteDataAsync(startLng, startLat, endLng, endLat, updatedData.TransportType);
+
+            existingTour.Distance = distance;
+            existingTour.EstimatedTime = time;
+            existingTour.RouteGeojson = geoJson;
+        }
+
+        existingTour.Title = updatedData.Title;
+        existingTour.Description = updatedData.Description;
+        existingTour.StartLocation = updatedData.StartLocation;
+        existingTour.EndLocation = updatedData.EndLocation;
+        existingTour.TransportType = updatedData.TransportType;
+        
+        existingTour.UpdatedAt = DateTime.Now; 
+
+        await _tourRepository.UpdateTourAsync(existingTour);
+        return existingTour;
     }
 
     public async Task DeleteTourAsync(int id)

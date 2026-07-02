@@ -18,7 +18,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, AbstractControl } from '@angul
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './input.component.html',
 })
 export class InputComponent implements ControlValueAccessor {

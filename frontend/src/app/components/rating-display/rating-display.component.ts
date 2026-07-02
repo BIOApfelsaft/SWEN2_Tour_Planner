@@ -3,7 +3,7 @@ import { Component, input, computed, ChangeDetectionStrategy } from '@angular/co
 @Component({
   selector: 'app-rating-display',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex items-center text-amber-500" [title]="'Rating: ' + rating() + ' / 5'">
       @for (star of stars(); track $index) {

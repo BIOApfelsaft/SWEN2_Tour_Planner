@@ -1,11 +1,7 @@
 <main class="pt-4 pb-20 md:pb-0 min-h-screen flex flex-col w-full">
   <div class="w-full p-margin flex-1 flex flex-col">
     
-    @if (isLoading()) {
-      <div class="flex-1 flex items-center justify-center font-body-md text-on-surface-variant">
-        Loading tour details...
-      </div>
-    } @else if (tour(); as currentTour) {
+    @if (tour(); as currentTour) {
       
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
         <div>
@@ -52,12 +48,12 @@
               <div class="w-px h-8 bg-outline-variant/50"></div>
               <div>
                 <div class="text-xs text-secondary uppercase tracking-wider font-bold mb-1">Est. Time</div>
-                <div class="font-title-sm text-on-surface">{{ currentTour.estimatedTime / 3600 | number:'1.0-1' }} hrs</div>
+                <div class="font-title-sm text-on-surface">{{ toNumber(currentTour.estimatedTime) / 3600 | number:'1.0-1' }} hrs</div>
               </div>
             </div>
               <div class="absolute top-4 left-4 right-4 md:right-auto bg-surface/95 backdrop-blur-md border border-outline-variant rounded-xl p-2 shadow-lg flex gap-md items-center z-10">
                 <div>
-                  <app-weather-widget [location]="currentTour.startLocation"></app-weather-widget>
+                  <app-weather-widget [location]="currentTour.startLocation || ''"></app-weather-widget>
                 </div>
               </div>
           </div>
@@ -67,18 +63,18 @@
             <p class="font-body-md text-body-md text-on-surface-variant mb-6">{{ currentTour.description }}</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
-              <div [class]="currentTour.computedPopularityScore > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+              <div [class]="toNumber(currentTour.computedPopularityScore) > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
                    class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
                 <span class="material-symbols-outlined mb-2 text-3xl">trending_up</span>
                 <span class="text-xs uppercase tracking-wider font-bold opacity-80">Popularity</span>
-                <span class="font-title-sm">{{ currentTour.computedPopularityScore | number:'1.0-1' }} / 100</span>
+                <span class="font-title-sm">{{ toNumber(currentTour.computedPopularityScore) | number:'1.0-1' }} / 100</span>
               </div>
               
-              <div [class]="currentTour.computedChildFriendlyScore > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+              <div [class]="toNumber(currentTour.computedChildFriendlyScore) > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
                    class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
                 <span class="material-symbols-outlined mb-2 text-3xl">family_restroom</span>
                 <span class="text-xs uppercase tracking-wider font-bold opacity-80">Child-friendly</span>
-                <span class="font-title-sm">{{ currentTour.computedChildFriendlyScore > 60 ? 'Yes' : 'No' }}</span>
+                <span class="font-title-sm">{{ toNumber(currentTour.computedChildFriendlyScore) > 60 ? 'Yes' : 'No' }}</span>
               </div>
             </div>
           </div>
@@ -122,10 +118,9 @@
 
 @if (isAddingLog() && tour(); as currentTour) {
   <app-tour-log-modal
-    [tourId]="currentTour.id"
-    [defaultDistance]="currentTour.distance"
-    [location]="currentTour.startLocation"
-    
+    [tourId]="toNumber(currentTour.id)"
+    [defaultDistance]="toNumber(currentTour.distance)"
+    [location]="currentTour.startLocation || ''"
     [log]="selectedLogToEdit()" 
     
     (closeModal)="closeLogModal()"

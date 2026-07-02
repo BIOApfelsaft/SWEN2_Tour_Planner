@@ -7,14 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateTourLogDto } from '../../models/create-tour-log-dto';
-import { TourLog } from '../../models/tour-log';
+import { CreateTourLogRequest } from '../../models/create-tour-log-request';
+import { TourLogResponse } from '../../models/tour-log-response';
 
 export interface ApiTourLogsPost$Json$Params {
-      body: CreateTourLogDto
+      body: CreateTourLogRequest
 }
 
-export function apiTourLogsPost$Json(http: HttpClient, rootUrl: string, params: ApiTourLogsPost$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<TourLog>> {
+export function apiTourLogsPost$Json(http: HttpClient, rootUrl: string, params: ApiTourLogsPost$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<TourLogResponse>> {
   const rb = new RequestBuilder(rootUrl, apiTourLogsPost$Json.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/*+json');
@@ -25,7 +25,7 @@ export function apiTourLogsPost$Json(http: HttpClient, rootUrl: string, params: 
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<TourLog>;
+      return r as StrictHttpResponse<TourLogResponse>;
     })
   );
 }

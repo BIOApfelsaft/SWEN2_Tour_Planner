@@ -9,7 +9,7 @@ interface DifficultyLevel {
 @Component({
   selector: 'app-difficulty-indicator',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       [class]="levelInfo().colorClass"

@@ -3,7 +3,7 @@ import { Component, input, computed, ChangeDetectionStrategy } from '@angular/co
 @Component({
   selector: 'app-button',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: ` <button
     [type]="type()"
     [class]="combinedClasses()"

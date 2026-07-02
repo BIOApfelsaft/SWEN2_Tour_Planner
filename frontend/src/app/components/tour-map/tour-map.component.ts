@@ -7,14 +7,14 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { Tour } from '../../models/tour.model';
+import { TourResponse } from '../../api/models/tour-response';
 import { MapFacadeService } from '../../services/map-facade.service';
 
 @Component({
   selector: 'app-tour-map',
   standalone: true,
   imports: [DecimalPipe],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="relative w-full rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100"
@@ -40,7 +40,7 @@ import { MapFacadeService } from '../../services/map-facade.service';
             Est. Time
           </div>
           <div class="font-title-sm text-on-surface">
-            {{ tour().estimatedTime / 3600 | number: '1.0-1' }} hrs
+            {{ toNumber(tour().estimatedTime) / 3600 | number: '1.0-1' }} hrs
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ import { MapFacadeService } from '../../services/map-facade.service';
   `,
 })
 export class TourMapComponent implements OnDestroy {
-  tour = input.required<Tour>();
+  tour = input.required<TourResponse>();
   private mapFacade = inject(MapFacadeService);
 
   constructor() {
@@ -67,5 +67,9 @@ export class TourMapComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.mapFacade.destroyMap();
+  }
+
+  toNumber(value: any): number {
+    return Number(value) || 0;
   }
 }

@@ -3,7 +3,7 @@ import { Component, input, output, ChangeDetectionStrategy } from '@angular/core
 @Component({
   selector: 'app-transport-type-selector',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-surface-container rounded-lg p-xs flex gap-xs border border-outline-variant/30">
       <button

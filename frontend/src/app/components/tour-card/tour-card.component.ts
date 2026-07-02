@@ -1,5 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-import { Tour } from '../../models/tour.model';
+import { TourResponse } from '../../api/models/tour-response';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 
@@ -7,7 +7,7 @@ import { DecimalPipe } from '@angular/common';
   selector: 'app-tour-card',
   standalone: true,
   imports: [RouterLink, DecimalPipe],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article
       [routerLink]="['/tour', tour().id]"
@@ -27,20 +27,28 @@ import { DecimalPipe } from '@angular/common';
           <span
             class="bg-[#EDF2F7] text-secondary font-label-caps text-label-caps px-2 py-1 rounded-full flex items-center gap-1"
           >
-            <span class="material-symbols-outlined text-[14px]">hiking</span>
-            {{ tour().transportType }}
+            <span class="inline-flex items-center gap-2">
+              @if (tour().transportType === 'Hiking') {
+                <span class="material-symbols-outlined text-[14px]">hiking</span>
+              } @else if (tour().transportType === 'MTB') {
+                <span class="material-symbols-outlined text-[14px]">directions_bike</span>
+              } @else if (tour().transportType === 'Car') {
+                <span class="material-symbols-outlined text-[14px]">directions_car</span>
+              }
+              {{ tour().transportType }}
+            </span>
           </span>
           <span
             class="bg-[#EDF2F7] text-secondary font-label-caps text-label-caps px-2 py-1 rounded-full flex items-center gap-1"
           >
             <span class="material-symbols-outlined text-[14px]">route</span>
-            {{ tour().distance }} km
+            {{ toNumber(tour().distance) }} km
           </span>
           <span
             class="bg-[#EDF2F7] text-secondary font-label-caps text-label-caps px-2 py-1 rounded-full flex items-center gap-1"
           >
             <span class="material-symbols-outlined text-[14px]">calendar_month</span>
-            {{ tour().estimatedTime / 3600 | number: '1.0-1' }} hours
+            {{ toNumber(tour().estimatedTime) / 3600 | number: '1.0-1' }} hours
           </span>
         </div>
       </div>
@@ -48,5 +56,9 @@ import { DecimalPipe } from '@angular/common';
   `,
 })
 export class TourCardComponent {
-  tour = input.required<Tour>();
+  tour = input.required<TourResponse>();
+
+  toNumber(value: any): number {
+    return Number(value) || 0;
+  }
 }

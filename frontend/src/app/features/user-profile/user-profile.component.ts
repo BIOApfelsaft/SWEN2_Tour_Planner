@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { TourLogService } from '../../services/tour-log.service';
+import { TourLogStateService } from '../../services/tour-log-state.service';
 import { ButtonComponent } from '../../components/button/button.component';
 import { InputComponent } from '../../components/input/input.component';
 import { UserResponse } from '../../api/models/user-response';
@@ -16,14 +16,21 @@ import { UserResponse } from '../../api/models/user-response';
 })
 export class UserProfileComponent implements OnInit {
   private userService = inject(UserService);
-  private tourLogService = inject(TourLogService);
+  public tourLogState = inject(TourLogStateService); 
   private fb = inject(FormBuilder);
 
   user = signal<UserResponse | null>(null);
 
-  totalDistance = signal<number>(0);
-  totalLogs = signal<number>(0);
-  totalTime = signal<number>(0);
+  totalLogs = computed(() => this.tourLogState.logs().length);
+  
+  totalDistance = computed(() => 
+    this.tourLogState.logs().reduce((sum, log) => sum + Number(log.totalDistance), 0)
+  );
+  
+  totalTime = computed(() => 
+    this.tourLogState.logs().reduce((sum, log) => sum + Number(log.totalTime), 0) / 3600
+  );
+
   isSaving = signal<boolean>(false);
   apiErrorMessage = signal<string | null>(null);
 
@@ -38,6 +45,8 @@ export class UserProfileComponent implements OnInit {
   };
 
   private async loadProfileData() {
+    this.tourLogState.loadMyLogs();
+    
     try {
       const currentUser = await this.userService.getCurrentUser();
       this.user.set(currentUser);
@@ -50,13 +59,6 @@ export class UserProfileComponent implements OnInit {
       if (currentUser.id == null) {
         throw new Error('Current user ID is missing');
       }
-
-      this.tourLogService.getAllLogsForUserId(Number(currentUser.id)).subscribe((logs) => {
-        this.totalLogs.set(logs.length);
-        this.totalDistance.set(logs.reduce((sum, log) => sum + log.totalDistance, 0));
-        this.totalTime.set(logs.reduce((sum, log) => sum + log.totalTime, 0) / 3600); 
-      });
-
     } catch (error) {
       console.error('Failed to load user profile', error);
       this.apiErrorMessage.set('Konnte Profil nicht laden.');

@@ -12,7 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MapFacadeService } from '../../services/map-facade.service';
 import { OpenRouteFacadeService } from '../../services/open-route-facade.service';
-import { TourService } from '../../services/tour.service';
+import { TourStateService } from '../../services/tour-state.service';
+import { CreateTourRequest } from '../../api/models/create-tour-request';
 import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { WeatherWidgetComponent } from '../../components/weather-widget/weather-widget.component';
@@ -30,7 +31,7 @@ import { DecimalPipe } from '@angular/common';
     TransportTypeSelectorComponent,
     DecimalPipe,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tour-planner.component.html',
 })
 export class TourPlannerComponent implements OnInit, OnDestroy {
@@ -39,7 +40,8 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private mapFacade = inject(MapFacadeService);
   private openRouteFacade = inject(OpenRouteFacadeService);
-  private tourService = inject(TourService);
+
+  public tourState = inject(TourStateService);
 
   // Signals
   isEditMode = signal<boolean>(false);
@@ -73,6 +75,10 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
     if (idParam) {
       this.isEditMode.set(true);
       this.editTourId.set(Number(idParam));
+
+      if (this.tourState.tours().length === 0) {
+          this.tourState.loadTours();
+      }
       this.loadTourForEdit(Number(idParam));
     }
 
@@ -94,25 +100,24 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
       ?.valueChanges.subscribe(() => this.triggerRouteCalculation());
   }
 
-  // Loads existing tour data into the form when in edit mode
-  private loadTourForEdit(id: number) {
-    this.tourService.getTourById(id).subscribe((tour) => {
-      if (tour) {
-        this.plannerForm.patchValue({
-          title: tour.title,
-          description: tour.description,
-          startLocation: tour.startLocation,
-          endLocation: tour.endLocation,
-          transportType: tour.transportType,
-        });
+private loadTourForEdit(id: number) {
+    const tour = this.tourState.tours().find(t => t.id === id);
+    
+    if (tour) {
+      this.plannerForm.patchValue({
+        title: tour.title,
+        description: tour.description,
+        startLocation: tour.startLocation,
+        endLocation: tour.endLocation,
+        transportType: tour.transportType,
+      });
 
-        this.distance.set(tour.distance);
-        this.estimatedTime.set(tour.estimatedTime);
-        this.startLocationSignal.set(tour.startLocation);
+      this.distance.set(Number(tour.distance));
+      this.estimatedTime.set(Number(tour.estimatedTime));
+      this.startLocationSignal.set(String(tour.startLocation));
 
-        setTimeout(() => this.mapFacade.drawMockRoute(), 500);
-      }
-    });
+      setTimeout(() => this.mapFacade.drawMockRoute(), 500);
+    }
   }
 
   onTransportTypeChange(type: string) {
@@ -140,25 +145,27 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
 
     this.isCalculating.set(true);
     const formValues = this.plannerForm.value;
-    const tourData = {
+    
+    const tourData: CreateTourRequest = {
       title: formValues.title || '',
-      description: formValues.description || '',
+      description: formValues.description || undefined,
       startLocation: formValues.startLocation || '',
+      startLng: 0.0,
+      startLat: 0.0,
       endLocation: formValues.endLocation || '',
+      endLng: 0.0,
+      endLat: 0.0,
       transportType: formValues.transportType || 'Hiking',
-      distance: this.distance(),
-      estimatedTime: this.estimatedTime(),
+      mapImagePath: undefined
     };
 
     if (this.isEditMode() && this.editTourId()) {
-      // UPDATE Tour
-      this.tourService.updateTour(this.editTourId()!, tourData).subscribe(() => {
+      this.tourState.updateTour(this.editTourId()!, tourData).subscribe(() => {
         this.isCalculating.set(false);
         this.router.navigate(['/tour', this.editTourId()]);
       });
     } else {
-      // CREATE Tour
-      this.tourService.createTour(tourData).subscribe((savedTour) => {
+      this.tourState.createTour(tourData).subscribe((savedTour) => {
         this.isCalculating.set(false);
         this.router.navigate(['/tour', savedTour.id]);
       });

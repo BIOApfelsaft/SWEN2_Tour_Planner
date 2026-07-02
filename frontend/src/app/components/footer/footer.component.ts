@@ -4,7 +4,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   selector: 'app-footer',
   imports: [],
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer
       class="bg-surface-container-low text-on-surface-variant font-body-sm text-xs w-full py-6 mt-auto border-t border-outline-variant"

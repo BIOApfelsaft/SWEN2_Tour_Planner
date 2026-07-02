@@ -7,14 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateTourDto } from '../../models/create-tour-dto';
-import { Tour } from '../../models/tour';
+import { CreateTourRequest } from '../../models/create-tour-request';
+import { TourResponse } from '../../models/tour-response';
 
 export interface ApiTourPost$Plain$Params {
-      body: CreateTourDto
+      body: CreateTourRequest
 }
 
-export function apiTourPost$Plain(http: HttpClient, rootUrl: string, params: ApiTourPost$Plain$Params, context?: HttpContext): Observable<StrictHttpResponse<Tour>> {
+export function apiTourPost$Plain(http: HttpClient, rootUrl: string, params: ApiTourPost$Plain$Params, context?: HttpContext): Observable<StrictHttpResponse<TourResponse>> {
   const rb = new RequestBuilder(rootUrl, apiTourPost$Plain.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/*+json');
@@ -25,7 +25,7 @@ export function apiTourPost$Plain(http: HttpClient, rootUrl: string, params: Api
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Tour>;
+      return r as StrictHttpResponse<TourResponse>;
     })
   );
 }

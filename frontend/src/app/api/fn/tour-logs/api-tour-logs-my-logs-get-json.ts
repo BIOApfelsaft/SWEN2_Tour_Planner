@@ -7,16 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { TourLog } from '../../models/tour-log';
+import { TourLogResponse } from '../../models/tour-log-response';
 
-export interface ApiTourLogsIdGet$Json$Params {
-  id: (number | string);
+export interface ApiTourLogsMyLogsGet$Json$Params {
 }
 
-export function apiTourLogsIdGet$Json(http: HttpClient, rootUrl: string, params: ApiTourLogsIdGet$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<TourLog>> {
-  const rb = new RequestBuilder(rootUrl, apiTourLogsIdGet$Json.PATH, 'get');
+export function apiTourLogsMyLogsGet$Json(http: HttpClient, rootUrl: string, params?: ApiTourLogsMyLogsGet$Json$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<TourLogResponse>>> {
+  const rb = new RequestBuilder(rootUrl, apiTourLogsMyLogsGet$Json.PATH, 'get');
   if (params) {
-    rb.path('id', params.id, {});
   }
 
   return http.request(
@@ -24,9 +22,9 @@ export function apiTourLogsIdGet$Json(http: HttpClient, rootUrl: string, params:
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<TourLog>;
+      return r as StrictHttpResponse<Array<TourLogResponse>>;
     })
   );
 }
 
-apiTourLogsIdGet$Json.PATH = '/api/TourLogs/{id}';
+apiTourLogsMyLogsGet$Json.PATH = '/api/TourLogs/my-logs';

@@ -7,7 +7,7 @@ import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 @Component({
   selector: 'app-main-layout',
   imports: [RouterOutlet, FooterComponent, HeaderComponent, SidebarComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './main-layout.html',
 })
 export class MainLayoutComponent {}

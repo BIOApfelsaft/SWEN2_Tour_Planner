@@ -7,15 +7,18 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { TourLogService } from '../../services/tour-log.service';
-import { TourService } from '../../services/tour.service';
-import { TourLog } from '../../models/tour-log.model';
-import { Tour } from '../../models/tour.model';
+
+import { TourResponse } from '../../api/models/tour-response';
+import { TourLogResponse } from '../../api/models/tour-log-response';
+import { CreateTourLogRequest } from '../../api/models/create-tour-log-request';
+
+import { TourLogStateService } from '../../services/tour-log-state.service';
+import { TourStateService } from '../../services/tour-state.service';
 import { RatingDisplayComponent } from '../../components/rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../../components/difficulty-display/difficulty-display.component';
 import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.component';
 
-export interface EnrichedTourLog extends TourLog {
+export interface EnrichedTourLog extends TourLogResponse {
   tourTitle: string;
   tourLocation: string;
   transportType: string;
@@ -31,23 +34,21 @@ export interface EnrichedTourLog extends TourLog {
     DifficultyIndicatorComponent,
     TourLogModalComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './activity-log.component.html',
 })
 export class ActivityLogComponent implements OnInit {
-  private tourLogService = inject(TourLogService);
-  private tourService = inject(TourService);
-
-  private rawLogs = signal<TourLog[]>([]);
-  private tours = signal<Tour[]>([]);
+  public tourLogState = inject(TourLogStateService); 
+  public tourState = inject(TourStateService);
 
   isEditModalOpen = signal<boolean>(false);
-  selectedLogToEdit = signal<TourLog | null>(null);
-  selectedTourForEdit = signal<Tour | null>(null);
+  selectedLogToEdit = signal<TourLogResponse | null>(null);
+  selectedTourForEdit = signal<TourResponse | null>(null);
 
   enrichedLogs = computed<EnrichedTourLog[]>(() => {
-    const allTours = this.tours();
-    return this.rawLogs().map((log) => {
+    const allTours = this.tourState.tours(); 
+    
+    return this.tourLogState.logs().map((log) => {
       const tour = allTours.find((t) => t.id === log.tourId);
       return {
         ...log,
@@ -59,13 +60,11 @@ export class ActivityLogComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.tourService.getTours().subscribe((tours) => {
-      this.tours.set(tours);
+    if (this.tourState.tours().length === 0) {
+      this.tourState.loadTours();
+    }
 
-      this.tourLogService.getAllLogsForUserId(1).subscribe((logs) => {
-        this.rawLogs.set(logs);
-      });
-    });
+    this.tourLogState.loadMyLogs();
   }
 
   getIconForTransport(type: string): string {
@@ -75,28 +74,29 @@ export class ActivityLogComponent implements OnInit {
   }
 
   editLog(log: EnrichedTourLog) {
-    const tour = this.tours().find((t) => t.id === log.tourId);
+    const tour = this.tourState.tours().find((t) => t.id === log.tourId);
     if (tour) {
       this.selectedTourForEdit.set(tour);
-      this.selectedLogToEdit.set(log as TourLog);
+      this.selectedLogToEdit.set(log as TourLogResponse);
       this.isEditModalOpen.set(true);
     }
   }
 
-  deleteLog(logId: number) {
+  deleteLog(log: EnrichedTourLog) {
     if (confirm('Are you sure you want to delete this activity?')) {
-      this.tourLogService.deleteLog(logId).subscribe(() => {
-        this.rawLogs.update((logs) => logs.filter((l) => l.id !== logId));
-      });
+      this.tourLogState.deleteLog(log.id as number, log.tourId as number);
     }
   }
 
-  saveUpdatedLog(updatedLogData: any) {
-    this.tourLogService.updateLog(updatedLogData.id, updatedLogData).subscribe((savedLog) => {
-      if (savedLog) {
-        this.rawLogs.update((logs) => logs.map((l) => (l.id === savedLog.id ? savedLog : l)));
-      }
-      this.isEditModalOpen.set(false);
-    });
+  saveUpdatedLog(updatedLogData: CreateTourLogRequest & { id?: number }) {
+    if (updatedLogData.id) {
+      this.tourLogState.updateLog(updatedLogData.id, updatedLogData);
+    }
+
+    this.isEditModalOpen.set(false);
+  }
+
+  toNumber(value: any): number {
+    return Number(value) || 0;
   }
 }
