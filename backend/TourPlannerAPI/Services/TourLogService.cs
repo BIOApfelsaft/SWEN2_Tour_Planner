@@ -1,23 +1,16 @@
 using TourPlannerAPI.Models;
-using TourPlannerAPI.DTOs;
+using TourPlannerAPI.Repositories;
 
 namespace TourPlannerAPI.Services;
 
-public class TourLogService : ITourLogService
+public class TourLogService(
+    ILogger<TourLogService> logger,
+    ITourLogRepository tourLogRepository,
+    ITourRepository tourRepository) : ITourLogService
 {
-    private readonly ILogger<TourLogService> _logger;
-    private readonly ITourLogRepository _tourLogRepository;
-    private readonly ITourRepository _tourRepository;
-
-    public TourLogService(
-        ILogger<TourLogService> logger, 
-        ITourLogRepository tourLogRepository, 
-        ITourRepository tourRepository)
-    {
-        _logger = logger;
-        _tourLogRepository = tourLogRepository;
-        _tourRepository = tourRepository;
-    }
+    private readonly ILogger<TourLogService> _logger = logger;
+    private readonly ITourLogRepository _tourLogRepository = tourLogRepository;
+    private readonly ITourRepository _tourRepository = tourRepository;
 
     public async Task<IEnumerable<TourLog>> GetTourLogsAsync(int tourId)
     {
@@ -31,51 +24,27 @@ public class TourLogService : ITourLogService
         return await _tourLogRepository.GetTourLogByIdAsync(id);
     }
 
-    public async Task<TourLog> AddTourLogAsync(CreateTourLogDto dto)
+    public async Task<TourLog> AddTourLogAsync(TourLog log)
     {
-        _logger.LogInformation("Adding new tour log for TourId: {TourId}", dto.TourId);
+        _logger.LogInformation("Adding new tour log for TourId: {TourId}", log.TourId);
         
-        var tourLog = new TourLog
-        {
-            TourId = dto.TourId,
-            LogDateTime = dto.LogDateTime,
-            Comment = dto.Comment,
-            Difficulty = dto.Difficulty,
-            TotalDistance = dto.TotalDistance,
-            TotalTime = dto.TotalTime,
-            Rating = dto.Rating,
-            WeatherCondition = dto.WeatherCondition,
-            Temperature = dto.Temperature,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+        log.CreatedAt = DateTime.Now;
+        log.UpdatedAt = DateTime.Now;
 
-        await _tourLogRepository.AddTourLogAsync(tourLog);
-        await RecalculateTourScoresAsync(tourLog.TourId);
+        await _tourLogRepository.AddTourLogAsync(log);
+        await RecalculateTourScoresAsync(log.TourId);
         
-        return tourLog;
+        return log;
     }
 
-    public async Task<bool> UpdateTourLogAsync(int id, CreateTourLogDto dto)
+    public async Task<bool> UpdateTourLogAsync(TourLog updatedLog)
     {
-        _logger.LogInformation("Updating tour log ID: {Id}", id);
+        _logger.LogInformation("Updating tour log ID: {Id}", updatedLog.Id);
         
-        var existingLog = await _tourLogRepository.GetTourLogByIdAsync(id);
-        if (existingLog == null) return false;
+        updatedLog.UpdatedAt = DateTime.Now;
 
-        existingLog.TourId = dto.TourId;
-        existingLog.LogDateTime = dto.LogDateTime;
-        existingLog.Comment = dto.Comment;
-        existingLog.Difficulty = dto.Difficulty;
-        existingLog.TotalDistance = dto.TotalDistance;
-        existingLog.TotalTime = dto.TotalTime;
-        existingLog.Rating = dto.Rating;
-        existingLog.WeatherCondition = dto.WeatherCondition;
-        existingLog.Temperature = dto.Temperature;
-        existingLog.UpdatedAt = DateTime.Now;
-
-        await _tourLogRepository.UpdateTourLogAsync(existingLog);
-        await RecalculateTourScoresAsync(existingLog.TourId);
+        await _tourLogRepository.UpdateTourLogAsync(updatedLog);
+        await RecalculateTourScoresAsync(updatedLog.TourId);
         
         return true;
     }

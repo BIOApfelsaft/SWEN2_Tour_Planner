@@ -1,6 +1,6 @@
-namespace TourPlannerAPI.DTOs;
+namespace TourPlannerAPI.DTOs.TourLogs;
 
-public class CreateTourLogDto
+public class CreateTourLogRequest
 {
     public int TourId { get; set; }
     public DateTime LogDateTime { get; set; }

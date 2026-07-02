@@ -14,6 +14,8 @@ builder.Services.AddControllers();
 
 builder.Logging.AddLog4Net("log4net.config");
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITourRepository, TourRepository>();
 builder.Services.AddScoped<ITourService, TourService>();

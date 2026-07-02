@@ -1,8 +1,13 @@
-using System.Threading.Tasks;
-using TourPlannerAPI.DTOs;
+using TourPlannerAPI.Models;
 
-public interface IAuthService
+namespace TourPlannerAPI.Services
 {
-    Task<bool> RegisterAsync(RegisterDto dto);
-    Task<string?> LoginAsync(LoginDto dto);
+    public interface IAuthService
+    {
+        Task<bool> RegisterAsync(User user, string rawPassword);
+
+        string GenerateChallenge(string username);
+
+        Task<string?> LoginWithChallengeAsync(string username, string clientResponse);
+    }
 }

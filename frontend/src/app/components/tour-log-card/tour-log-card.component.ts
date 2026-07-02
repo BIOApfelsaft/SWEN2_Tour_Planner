@@ -1,6 +1,6 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { TourLog } from '../../models/tour-log.model';
+import { TourLogResponse } from '../../api/models/tour-log-response';
 import { RatingDisplayComponent } from '../rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../difficulty-display/difficulty-display.component';
 
@@ -8,13 +8,14 @@ import { DifficultyIndicatorComponent } from '../difficulty-display/difficulty-d
   selector: 'app-tour-log-card',
   standalone: true,
   imports: [DatePipe, DecimalPipe, RatingDisplayComponent, DifficultyIndicatorComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tour-log-card.component.html',
 })
 export class TourLogCardComponent {
-  log = input.required<TourLog>();
-  
-  edit = output<TourLog>();
-  delete = output<TourLog>();
+  log = input.required<TourLogResponse>();
+
+  edit = output<TourLogResponse>();
+  delete = output<TourLogResponse>();
 
   onEdit() {
     this.edit.emit(this.log());
@@ -22,5 +23,9 @@ export class TourLogCardComponent {
 
   onDelete() {
     this.delete.emit(this.log());
+  }
+
+  toNumber(value: any): number {
+    return Number(value) || 0;
   }
 }

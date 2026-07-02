@@ -1,9 +1,24 @@
-import { Component, input, output, inject, OnInit, signal } from '@angular/core';
-import { AbstractControl, ValidationErrors, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  input,
+  output,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import {
+  AbstractControl,
+  ValidationErrors,
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { WeatherService, WeatherData } from '../../services/weather.service';
-import { TourLog } from '../../models/tour-log.model';
+import { TourLogResponse } from '../../api/models/tour-log-response';
+import { CreateTourLogRequest } from '../../api/models/create-tour-log-request';
 import { RatingDisplayComponent } from '../../components/rating-display/rating-display.component';
 import { DifficultyIndicatorComponent } from '../../components/difficulty-display/difficulty-display.component';
 
@@ -32,7 +47,14 @@ export function dateRangeValidator(control: AbstractControl): ValidationErrors |
 @Component({
   selector: 'app-tour-log-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, InputComponent, ButtonComponent, RatingDisplayComponent, DifficultyIndicatorComponent],
+  imports: [
+    ReactiveFormsModule,
+    InputComponent,
+    ButtonComponent,
+    RatingDisplayComponent,
+    DifficultyIndicatorComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tour-log-modal.component.html',
 })
 export class TourLogModalComponent implements OnInit {
@@ -40,13 +62,13 @@ export class TourLogModalComponent implements OnInit {
   tourId = input.required<number>();
   defaultDistance = input<number>(0);
   location = input<string>('');
-  
+
   // Optional log for Edit Mode
-  log = input<TourLog | null>(null);
+  log = input<TourLogResponse | null>(null);
 
   // Outputs to the Parent
   closeModal = output<void>();
-  saveLog = output<any>();
+  saveLog = output<CreateTourLogRequest & { id?: number }>();
 
   private fb = inject(FormBuilder);
   private weatherService = inject(WeatherService);
@@ -54,42 +76,52 @@ export class TourLogModalComponent implements OnInit {
   fetchedWeather: WeatherData | null = null;
   isLoadingWeather = signal<boolean>(false);
 
-  logForm = this.fb.group({
-    startDate: [new Date().toISOString().split('T')[0], Validators.required],
-    startTime: ['08:00', Validators.required],
-    endDate: [new Date().toISOString().split('T')[0], Validators.required],
-    endTime: ['14:00', Validators.required],
-    distance: [0, [Validators.required, Validators.min(0)]],
-    difficulty: [3, [Validators.required, Validators.min(1), Validators.max(5)]],
-    rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
-    comment: ['']
-  }, { validators: dateRangeValidator });
+  logForm = this.fb.group(
+    {
+      startDate: [new Date().toISOString().split('T')[0], Validators.required],
+      startTime: ['08:00', Validators.required],
+      endDate: [new Date().toISOString().split('T')[0], Validators.required],
+      endTime: ['14:00', Validators.required],
+      distance: [0, [Validators.required, Validators.min(0)]],
+      difficulty: [3, [Validators.required, Validators.min(1), Validators.max(5)]],
+      rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+      comment: [''],
+    },
+    { validators: dateRangeValidator },
+  );
 
   ngOnInit() {
     const existingLog = this.log();
 
     if (existingLog) {
-      // Setup Edit Mode
-      const startDateObj = new Date(existingLog.logDateTime);
-      const endDateObj = new Date(startDateObj.getTime() + (existingLog.totalTime * 1000));
+      const safeDateString = existingLog.logDateTime || new Date().toISOString();
+      const start = new Date(safeDateString);
+      
+      const safeTotalTime = existingLog.totalTime || 0;
+      const end = new Date(start.getTime() + (Number(safeTotalTime) * 1000));
+
+      const startDateStr = start.toISOString().split('T')[0];
+      const startTimeStr = start.toTimeString().substring(0, 5);
+      
+      const endDateStr = end.toISOString().split('T')[0];
+      const endTimeStr = end.toTimeString().substring(0, 5);
 
       this.logForm.patchValue({
-        startDate: startDateObj.toISOString().split('T')[0],
-        startTime: startDateObj.toTimeString().substring(0, 5),
-        endDate: endDateObj.toISOString().split('T')[0],
-        endTime: endDateObj.toTimeString().substring(0, 5),
-        distance: existingLog.totalDistance,
-        difficulty: existingLog.difficulty,
-        rating: existingLog.rating,
-        comment: existingLog.comment
+        startDate: startDateStr,
+        startTime: startTimeStr,
+        endDate: endDateStr,
+        endTime: endTimeStr,
+        distance: Number(existingLog.totalDistance),
+        difficulty: Number(existingLog.difficulty),
+        rating: Number(existingLog.rating),
+        comment: existingLog.comment,
       });
-      
+
       this.fetchedWeather = {
-        temperature: existingLog.temperature || 0,
+        temperature: Number(existingLog.temperature) || 0,
         condition: existingLog.weatherCondition || 'Unknown',
-        icon: 'cloud'
+        icon: 'cloud',
       };
-      
     } else {
       // Setup Create Mode
       this.logForm.patchValue({ distance: this.defaultDistance() });
@@ -104,7 +136,7 @@ export class TourLogModalComponent implements OnInit {
           error: (err) => {
             console.error('Weather error', err);
             this.isLoadingWeather.set(false);
-          }
+          },
         });
       }
     }
@@ -114,25 +146,25 @@ export class TourLogModalComponent implements OnInit {
     if (this.logForm.valid) {
       const formValues = this.logForm.value;
       const existingLog = this.log();
-      
+
       const start = new Date(`${formValues.startDate}T${formValues.startTime}`);
       const end = new Date(`${formValues.endDate}T${formValues.endTime}`);
-      
-      let diffInSeconds = (end.getTime() - start.getTime()) / 1000;
-      
-      if (diffInSeconds < 0) diffInSeconds = 0; 
 
-      const finalLogData = {
-        id: existingLog ? existingLog.id : undefined,
+      let diffInSeconds = (end.getTime() - start.getTime()) / 1000;
+
+      if (diffInSeconds < 0) diffInSeconds = 0;
+
+      const finalLogData: CreateTourLogRequest & { id?: number } = {
+        id: Number(existingLog ? existingLog.id : undefined),
         tourId: this.tourId(),
         logDateTime: start.toISOString(),
-        comment: formValues.comment,
+        comment: formValues.comment || '',
         difficulty: Number(formValues.difficulty),
         rating: Number(formValues.rating),
         totalDistance: Number(formValues.distance),
         totalTime: diffInSeconds,
         weatherCondition: this.fetchedWeather?.condition || 'Unknown',
-        temperature: this.fetchedWeather?.temperature || 0
+        temperature: this.fetchedWeather?.temperature || 0,
       };
 
       this.saveLog.emit(finalLogData);

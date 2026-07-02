@@ -3,66 +3,85 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TourPlannerAPI.Data;
-using TourPlannerAPI.DTOs;
 using TourPlannerAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Security.Cryptography;
 
-public class AuthService : IAuthService
+namespace TourPlannerAPI.Services
 {
-    private readonly AppDbContext _db;
-    private readonly IConfiguration _config;
-
-    public AuthService(AppDbContext db, IConfiguration config)
+    public class AuthService(AppDbContext db, IConfiguration config, IMemoryCache cache) : IAuthService
     {
-        _db = db;
-        _config = config;
-    }
+        private readonly AppDbContext _db = db;
+        private readonly IConfiguration _config = config;
+        private readonly IMemoryCache _cache = cache;
 
-    public async Task<bool> RegisterAsync(RegisterDto dto)
-    {
-        if (await _db.Users.AnyAsync(u => u.Username == dto.Username))
-            return false;
-
-        var user = new User
+        public async Task<bool> RegisterAsync(User user, string rawPassword)
         {
-            Username = dto.Username,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Email = dto.Email
-        };
+            if (await _db.Users.AnyAsync(u => u.Username == user.Username))
+                return false;
+    
+            user.PasswordHash = ComputeSha256(rawPassword);
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
+            return true;
+        }
 
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<string?> LoginAsync(LoginDto dto)
-    {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
-        if (user is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-            return null;
-
-        return GenerateToken(user);
-    }
-
-    private string GenerateToken(User user)
-    {
-        var claims = new[]
+        public string GenerateChallenge(string username)
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
-        };
+            var challenge = Guid.NewGuid().ToString("N");
+            
+            // Save challenge in cache with 2 minutes expiration time
+            _cache.Set(username, challenge, TimeSpan.FromMinutes(2));
+            
+            return challenge;
+        }
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        public async Task<string?> LoginWithChallengeAsync(string username, string clientResponse)
+        {
+            if (!_cache.TryGetValue(username, out string? activeChallenge))
+                return null;
 
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiryMinutes"]!)),
-            signingCredentials: creds
-        );
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return null;
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            var expectedResponse = ComputeSha256(user.PasswordHash + activeChallenge);
+
+            _cache.Remove(username);
+            if (expectedResponse != clientResponse)
+                return null;
+
+            return GenerateToken(user);
+        }
+
+        public static string ComputeSha256(string rawData)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
+            var builder = new StringBuilder();
+            foreach (var b in bytes) builder.Append(b.ToString("x2"));
+            return builder.ToString();
+        }
+
+        private string GenerateToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiryMinutes"]!)),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

@@ -5,12 +5,11 @@ import * as L from 'leaflet';
   providedIn: 'root'
 })
 export class MapFacadeService {
-  private map: L.Map | null = null;
-  private routeLayer: L.GeoJSON | null = null;
+  private maps = new Map<string, L.Map>();
+  private routeLayers = new Map<string, L.GeoJSON>();
 
-  // Mockdata
   initMap(containerId: string): void {
-    this.destroyMap();
+    this.destroyMap(containerId);
 
     const container = document.getElementById(containerId);
     if (!container) {
@@ -18,72 +17,79 @@ export class MapFacadeService {
       return; 
     }
 
-    this.map = L.map(containerId, {
+    const map = L.map(containerId, {
       zoomControl: false 
-    }).setView([46.0207, 7.7491], 10);
+    }).setView([47.5162, 14.5501], 7);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(this.map);
+    }).addTo(map);
 
     L.control.zoom({
       position: 'bottomright'
-    }).addTo(this.map);
+    }).addTo(map);
+
+    this.maps.set(containerId, map);
   }
 
-  drawMockRoute(): void {
-    if (!this.map) return;
-
-    this.clearRoute();
-
-    const mockGeoJson: any = {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [7.7491, 46.0207], 
-          [7.7700, 46.0000],
-          [7.8000, 45.9800],
-          [7.8500, 45.9500]
-        ]
-      }
-    };
+  drawRoute(mapId: string, geoJsonString: string | null | undefined) {
+    if (!geoJsonString) return;
+    
+    const map = this.maps.get(mapId);
+    if (!map) {
+      console.warn(`Cannot draw route: Map with ID '${mapId}' not found.`);
+      return;
+    }
 
     try {
-      this.routeLayer = L.geoJSON(mockGeoJson, {
-        style: { color: '#ba1a1a', weight: 5, opacity: 0.8 }
-      }).addTo(this.map);
+      this.clearRoute(mapId);
 
-      this.map.fitBounds(this.routeLayer.getBounds(), { 
-        padding: [50, 50],
-      });
-    } catch (e) {
-      console.warn('Error drawing route on map', e);
+      const geoJsonData = JSON.parse(geoJsonString);
+
+      const routeLayer = L.geoJSON(geoJsonData, {
+        style: {
+          color: '#0a58ca',
+          weight: 5,
+          opacity: 0.8
+        }
+      }).addTo(map);
+
+      this.routeLayers.set(mapId, routeLayer);
+
+      map.fitBounds(routeLayer.getBounds(), { padding: [30, 30] });
+      
+    } catch (error) {
+      console.error('Could not parse GeoJSON', error);
     }
   }
 
-  clearRoute(): void {
-    if (this.routeLayer && this.map) {
+  clearRoute(mapId: string): void {
+    const routeLayer = this.routeLayers.get(mapId);
+    const map = this.maps.get(mapId);
+
+    if (routeLayer && map) {
       try {
-        this.routeLayer.remove();
+        routeLayer.remove();
       } catch (e) {
+        console.error(`Error removing route layer for map '${mapId}'`, e);
       }
-      this.routeLayer = null;
+      this.routeLayers.delete(mapId);
     }
   }
 
-  destroyMap(): void {
-    if (this.map) {
+  destroyMap(mapId: string): void {
+    this.clearRoute(mapId);
+
+    const map = this.maps.get(mapId);
+    if (map) {
       try {
-        this.map.off();
-        this.map.remove();
+        map.off();
+        map.remove();
       } catch (e) {
-        console.info('Leaflet map safely disposed after DOM removal.');
+        console.info(`Leaflet map '${mapId}' safely disposed after DOM removal.`);
       } finally {
-        this.map = null;
-        this.routeLayer = null;
+        this.maps.delete(mapId);
       }
     }
   }

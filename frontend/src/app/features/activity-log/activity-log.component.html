@@ -42,23 +42,23 @@
             </div>
 
             <div class="col-span-1 xl:col-span-2 flex flex-row xl:flex-col gap-2 xl:gap-0 text-sm">
-              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">route</span> {{ log.totalDistance }} km</div>
-              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">timer</span> {{ log.totalTime / 3600 | number:'1.0-1' }} hrs</div>
+              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">route</span> {{ toNumber(log.totalDistance) }} km</div>
+              <div class="flex items-center gap-1 text-secondary"><span class="material-symbols-outlined text-[16px] text-outline">timer</span> {{ toNumber(log.totalTime) / 3600 | number:'1.0-1' }} hrs</div>
             </div>
 
             <div class="col-span-1 xl:col-span-2">
-              <app-difficulty-indicator [level]="log.difficulty"></app-difficulty-indicator>
+              <app-difficulty-indicator [level]="toNumber(log.difficulty) || 0"></app-difficulty-indicator>
             </div>
 
             <div class="col-span-1 xl:col-span-2 flex items-center">
-              <app-rating-display [rating]="log.rating"></app-rating-display>
+              <app-rating-display [rating]="toNumber(log.rating) || 0"></app-rating-display>
             </div>
 
             <div class="col-span-1 xl:col-span-1 flex justify-end gap-2 xl:opacity-0 group-hover:opacity-100 transition-opacity">
               <button (click)="editLog(log)" class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container rounded-md transition-colors">
                 <span class="material-symbols-outlined text-[20px]">edit</span>
               </button>
-              <button (click)="deleteLog(log.id)" class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors">
+              <button (click)="deleteLog(log)" class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors">
                 <span class="material-symbols-outlined text-[20px]">delete</span>
               </button>
             </div>
@@ -75,9 +75,9 @@
 
   @if (isEditModalOpen() && selectedTourForEdit()) {
     <app-tour-log-modal
-      [tourId]="selectedTourForEdit()!.id"
-      [defaultDistance]="selectedTourForEdit()!.distance"
-      [location]="selectedTourForEdit()!.startLocation"
+      [tourId]="toNumber(selectedTourForEdit()!.id) || 0"
+      [defaultDistance]="toNumber(selectedTourForEdit()!.distance) || 0"
+      [location]="selectedTourForEdit()!.startLocation || ''"
       [log]="selectedLogToEdit()"
       (closeModal)="isEditModalOpen.set(false)"
       (saveLog)="saveUpdatedLog($event)">

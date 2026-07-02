@@ -4,21 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TourPlannerAPI.Repositories;
 
-public class TourRepository : ITourRepository
+public class TourRepository(AppDbContext context) : ITourRepository
 {
-    private readonly AppDbContext _context;
-
-    public TourRepository(AppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly AppDbContext _context = context;
 
     public async Task<IEnumerable<Tour>> GetAllToursAsync()
     {
         return await _context.Tours.ToListAsync();
     }
 
-    public async Task<Tour> GetTourByIdAsync(int id)
+    public async Task<Tour?> GetTourByIdAsync(int id)
     {
         return await _context.Tours.FindAsync(id);
     }

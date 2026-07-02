@@ -4,16 +4,8 @@
     <section class="relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm border border-outline-variant p-lg flex flex-col md:flex-row items-center gap-lg">
       <div class="absolute top-0 left-0 w-full h-32 bg-linear-to-r from-primary to-primary-fixed z-0"></div>
       
-      <div class="relative z-10 w-32 h-32 rounded-full border-4 border-surface-container-lowest overflow-hidden shadow-md shrink-0">
-        <img [src]="currentUser.avatarUrl" [alt]="currentUser.name" class="w-full h-full object-cover">
-      </div>
-      
       <div class="relative z-10 flex-1 text-center md:text-left">
-        <h1 class="font-headline-lg text-headline-lg text-on-primary mb-xs">{{ currentUser.name }}</h1>
-      </div>
-      
-      <div class="relative z-10 flex gap-sm">
-        <app-button label="Edit Cover" variant="primary"></app-button>
+        <h1 class="font-headline-lg text-headline-lg text-on-primary mb-xs">{{ currentUser.username }}</h1>
       </div>
     </section>
 
@@ -36,9 +28,22 @@
               <app-input label="Password" type="password" formControlName="password" [control]="profileForm.get('password')"></app-input>
             </div>
             
-            <div class="flex justify-end pt-md border-t border-outline-variant/30 mt-md">
-              <app-button type="submit" [label]="isSaving() ? 'Saving...' : 'Save Changes'" variant="primary" [disabled]="profileForm.invalid || isSaving()"></app-button>
-            </div>
+            <div class="flex flex-col sm:flex-row justify-between items-center pt-md border-t border-outline-variant/30 mt-md gap-4">
+                <app-button 
+                  type="button" 
+                  label="Delete Account" 
+                  variant="error" 
+                  (click)="onDeleteAccount()"
+                  [disabled]="isSaving()">
+                </app-button>
+
+                <app-button 
+                  type="submit" 
+                  [label]="isSaving() ? 'Saving...' : 'Save Changes'" 
+                  variant="primary" 
+                  [disabled]="profileForm.invalid || isSaving()">
+                </app-button>
+              </div>
           </form>
         </section>
       </div>

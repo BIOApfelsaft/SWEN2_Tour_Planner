@@ -1,10 +1,19 @@
-import { Component, signal, inject, OnInit, effect, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  effect,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  computed,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Tour } from '../../models/tour.model';
-import { TourLog } from '../../models/tour-log.model';
 import { DecimalPipe } from '@angular/common';
-import { TourService } from '../../services/tour.service';
-import { TourLogService } from '../../services/tour-log.service';
+import { TourStateService } from '../../services/tour-state.service';
+import { TourLogStateService } from '../../services/tour-log-state.service';
+import { CreateTourLogRequest } from '../../api/models/create-tour-log-request';
+import { TourLogResponse } from '../../api/models/tour-log-response';
 import { TourLogCardComponent } from '../../components/tour-log-card/tour-log-card.component';
 import { MapFacadeService } from '../../services/map-facade.service';
 import { TourMapComponent } from '../../components/tour-map/tour-map.component';
@@ -15,28 +24,37 @@ import { TourLogModalComponent } from '../tour-log-modal/tour-log-modal.componen
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [DecimalPipe, TourLogCardComponent, TourMapComponent, WeatherWidgetComponent, ButtonComponent, TourLogModalComponent],
-  templateUrl: './tour-detail.component.html'
+  imports: [
+    DecimalPipe,
+    TourLogCardComponent,
+    TourMapComponent,
+    WeatherWidgetComponent,
+    ButtonComponent,
+    TourLogModalComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './tour-detail.component.html',
 })
 export class TourDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
-  private tourService = inject(TourService);
-  private tourLogService = inject(TourLogService);
-  private mapFacade = inject(MapFacadeService);
   private router = inject(Router);
+  private mapFacade = inject(MapFacadeService);
 
-  tour = signal<Tour | null>(null);
-  logs = signal<TourLog[]>([]);
-  
+  public tourState = inject(TourStateService);
+  public tourLogState = inject(TourLogStateService);
+
+  currentTourId = signal<number>(0);
+
+  tour = computed(() => this.tourState.tours().find(t => t.id === this.currentTourId()) || null);
+  logs = computed(() => this.tourLogState.logs());
+
   isAddingLog = signal<Boolean>(false);
-  selectedLogToEdit = signal<TourLog | null>(null);
-
-  isLoading = signal<Boolean>(true);
+  selectedLogToEdit = signal<TourLogResponse | null>(null);
 
   constructor() {
-    // effect init map when tour data is loaded 
+    // effect init map when tour data is loaded
     effect(() => {
-      if (!this.isLoading() && this.tour()) {
+      if (this.tour()) {
         setTimeout(() => {
           this.mapFacade.initMap(`leaflet-map-${this.tour()?.id}`);
         }, 0);
@@ -45,53 +63,31 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const tourId = Number(this.route.snapshot.paramMap.get('id'));
-    if (tourId) this.loadTourData(tourId);
-  }
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.currentTourId.set(id);
 
-  private loadTourData(tourId: number): void {
-    this.isLoading.set(true);
+    if (this.tourState.tours().length === 0) {
+      this.tourState.loadTours();
+    }
 
-    // Fetch the main tour profile
-    this.tourService.getTourById(tourId).subscribe({
-      next: (tourData) => {
-        if (tourData) {
-          this.tour.set(tourData);
-        }
-      },
-      error: (err) => console.error('Error loading tour profile', err)
-    });
-
-    // Fetch the tracking history logs
-    this.tourLogService.getTourLogsForTourId(tourId).subscribe({
-      next: (logsData) => {
-        this.logs.set(logsData);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading tour logs', err);
-        this.isLoading.set(false);
-      }
-    });
+    this.tourLogState.loadLogsForTour(id);
   }
 
   editTour() {
-    const currentTour = this.tour();
-    if (currentTour) {
-      this.router.navigate(['/tour-planner', currentTour.id]);
-    }
+    if (this.tour()) this.router.navigate(['/tour-planner', this.tour()!.id]);
   }
 
   deleteTour() {
     const currentTour = this.tour();
-    if (currentTour) {
-      const isConfirmed = confirm(`Are you sure you want to delete the tour "${currentTour.title}"?`);
-      
-      if (isConfirmed) {
-        this.tourService.deleteTour(currentTour.id).subscribe(() => {
+    if (currentTour && confirm(`Are you sure you want to delete "${currentTour.title}"?`)) {
+      this.tourState.deleteTour(Number(currentTour.id)).subscribe({
+        next: () => {
           this.router.navigate(['/']);
-        });
-      }
+        },
+        error: (error) => {
+          console.error(`Error deleting tour with ID ${currentTour.id}:`, error);
+        }
+      });
     }
   }
 
@@ -100,8 +96,8 @@ export class TourDetailComponent implements OnInit, OnDestroy {
     this.isAddingLog.set(true);
   }
 
-  handleEditLog(log: TourLog) {
-    this.selectedLogToEdit.set(log); 
+  handleEditLog(log: TourLogResponse) {
+    this.selectedLogToEdit.set(log);
     this.isAddingLog.set(true);
   }
 
@@ -110,33 +106,24 @@ export class TourDetailComponent implements OnInit, OnDestroy {
     this.selectedLogToEdit.set(null);
   }
 
-  saveLog(logData: any) {
+  saveLog(logData: CreateTourLogRequest & { id?: number }) {
     if (logData.id) {
-      // UPDATE: If an ID exists, we update the existing log
-      this.tourLogService.updateLog(logData.id, logData).subscribe(updatedLog => {
-        if (updatedLog) {
-          this.logs.update(currentLogs => 
-            currentLogs.map(l => l.id === updatedLog.id ? updatedLog : l)
-          );
-        }
-        this.closeLogModal();
-      });
+      this.tourLogState.updateLog(logData.id, logData);
     } else {
-      // CREATE: If no ID exists, we create a new log
-      this.tourLogService.addLog(logData).subscribe(savedLog => {
-        this.logs.update(currentLogs => [savedLog, ...currentLogs]);
-        this.closeLogModal();
-      });
+      this.tourLogState.addLog(logData);
     }
+    this.closeLogModal();
   }
 
-  handleDeleteLog(log: TourLog) {
-    this.tourLogService.deleteLog(log.id).subscribe(() => {
-      this.logs.update(currentLogs => currentLogs.filter(l => l.id !== log.id));
-    });
+  handleDeleteLog(log: TourLogResponse) {
+    this.tourLogState.deleteLog(Number(log.id), Number(log.tourId));
   }
 
   ngOnDestroy(): void {
-    this.mapFacade.destroyMap();
+    this.mapFacade.destroyMap(this.tour() ? `leaflet-map-${this.tour()?.id}` : '');
+  }
+
+  toNumber(value: any): number {
+    return Number(value) || 0;
   }
 }
