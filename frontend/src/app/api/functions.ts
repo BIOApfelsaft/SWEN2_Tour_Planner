@@ -45,6 +45,8 @@ export type { ApiTourIdPut$Params as ApiTourIdPut$Params } from './fn/tour/api-t
 export { apiTourIdPut as apiTourIdPut } from './fn/tour/api-tour-id-put';
 export type { ApiTourIdDelete$Params as ApiTourIdDelete$Params } from './fn/tour/api-tour-id-delete';
 export { apiTourIdDelete as apiTourIdDelete } from './fn/tour/api-tour-id-delete';
+export type { ApiTourCalculateGet$Params as ApiTourCalculateGet$Params } from './fn/tour/api-tour-calculate-get';
+export { apiTourCalculateGet as apiTourCalculateGet } from './fn/tour/api-tour-calculate-get';
 export type { ApiUserMeGet$Plain$Params as ApiUserMeGet$Plain$Params } from './fn/user/api-user-me-get-plain';
 export { apiUserMeGet$Plain as apiUserMeGet$Plain } from './fn/user/api-user-me-get-plain';
 export type { ApiUserMeGet$Json$Params as ApiUserMeGet$Json$Params } from './fn/user/api-user-me-get-json';

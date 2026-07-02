@@ -7,18 +7,19 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateTourRequest } from '../../models/create-tour-request';
 
-export interface ApiTourIdPut$Params {
-  id: (number | string);
-      body: CreateTourRequest
+export interface ApiTourCalculateGet$Params {
+  start?: string;
+  end?: string;
+  transportType?: string;
 }
 
-export function apiTourIdPut(http: HttpClient, rootUrl: string, params: ApiTourIdPut$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, apiTourIdPut.PATH, 'put');
+export function apiTourCalculateGet(http: HttpClient, rootUrl: string, params?: ApiTourCalculateGet$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, apiTourCalculateGet.PATH, 'get');
   if (params) {
-    rb.path('id', params.id, {});
-    rb.body(params.body, 'application/*+json');
+    rb.query('start', params.start, {});
+    rb.query('end', params.end, {});
+    rb.query('transportType', params.transportType, {});
   }
 
   return http.request(
@@ -31,4 +32,4 @@ export function apiTourIdPut(http: HttpClient, rootUrl: string, params: ApiTourI
   );
 }
 
-apiTourIdPut.PATH = '/api/Tour/{id}';
+apiTourCalculateGet.PATH = '/api/Tour/calculate';

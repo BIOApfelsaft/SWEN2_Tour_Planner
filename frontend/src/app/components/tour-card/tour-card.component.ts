@@ -1,7 +1,8 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy, effect, inject, OnDestroy } from '@angular/core';
 import { TourResponse } from '../../api/models/tour-response';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { MapFacadeService } from '../../services/map-facade.service';
 
 @Component({
   selector: 'app-tour-card',
@@ -14,11 +15,7 @@ import { DecimalPipe } from '@angular/common';
       class="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(84,95,114,0.04)] border border-outline-variant overflow-hidden flex flex-col group hover:shadow-[0_4px_16px_rgba(84,95,114,0.08)] transition-all cursor-pointer"
     >
       <div class="h-40 w-full bg-surface-container relative overflow-hidden">
-        <img
-          [src]="tour().mapImagePath"
-          [alt]="tour().title"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+        <div [id]="'leaflet-card-map-' + tour().id" class="w-full h-48 z-0"></div>
       </div>
 
       <div class="p-md flex flex-col gap-sm">
@@ -55,10 +52,36 @@ import { DecimalPipe } from '@angular/common';
     </article>
   `,
 })
-export class TourCardComponent {
+export class TourCardComponent implements OnDestroy {
   tour = input.required<TourResponse>();
+  private mapFacade = inject(MapFacadeService);
+  private mapId = '';
 
-  toNumber(value: any): number {
+  constructor() {
+    effect(() => {
+      const currentTour = this.tour();
+      if (currentTour) {
+        this.mapId = `leaflet-card-map-${currentTour.id}`;
+        
+        setTimeout(() => {
+          this.mapFacade.initMap(this.mapId);
+          
+          // Echte Route einzeichnen!
+          if (currentTour.routeGeojson) {
+             this.mapFacade.drawRoute(this.mapId, currentTour.routeGeojson);
+          }
+        }, 100);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.mapId) {
+      this.mapFacade.destroyMap(this.mapId); 
+    }
+  }
+
+    toNumber(value: any): number {
     return Number(value) || 0;
   }
 }

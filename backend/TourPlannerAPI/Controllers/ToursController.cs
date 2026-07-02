@@ -32,11 +32,9 @@ namespace TourPlannerAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<TourResponse>> CreateTour([FromBody] CreateTourRequest dto)
         {
-            // 1. Get UserId from JWT Token
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
-            // 2. Mapping: DTO -> Entity
             var newTour = new Tour
             {
                 UserId = userId,
@@ -48,11 +46,9 @@ namespace TourPlannerAPI.Controllers
                 MapImagePath = dto.MapImagePath
             };
 
-            // 3. Call Service
             var createdTour = await _tourService.CreateTourAsync(
                 newTour, dto.StartLng, dto.StartLat, dto.EndLng, dto.EndLat);
 
-            // 4. Return Response
             return CreatedAtAction(nameof(GetAllTours), new { id = createdTour.Id }, MapToResponse(createdTour));
         }
 
@@ -100,6 +96,26 @@ namespace TourPlannerAPI.Controllers
             Console.WriteLine($"Deleting tour with ID: {id}");
             await _tourService.DeleteTourAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("calculate")]
+        public async Task<IActionResult> CalculateRoutePreview([FromQuery] string start, [FromQuery] string end, [FromQuery] string transportType)
+        {
+            try
+            {
+                var (Distance, EstimatedTime, GeoJson) = await _tourService.CalculateRoutePreviewAsync(start, end, transportType);
+
+                return Ok(new RouteCalculationResponse
+                {
+                    Distance = Distance,
+                    EstimatedTime = EstimatedTime,
+                    GeoJson = GeoJson
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
         }
     }
 }

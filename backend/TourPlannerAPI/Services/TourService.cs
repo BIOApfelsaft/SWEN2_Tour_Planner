@@ -105,4 +105,19 @@ public class TourService(
         _logger.LogInformation("Deleting tour by ID: {Id}", id);
         await _tourRepository.DeleteTourAsync(id);
     }
+
+    public async Task<(decimal Distance, int EstimatedTime, string GeoJson)> CalculateRoutePreviewAsync(string startLocation, string endLocation, string transportType)
+    {
+        _logger.LogInformation("Calculating route preview for {Start} to {End}", startLocation, endLocation);
+
+        var (Lng, Lat) = await _orsClient.GetCoordinatesAsync(startLocation);
+        var (EndLng, EndLat) = await _orsClient.GetCoordinatesAsync(endLocation);
+
+        var routeData = await _orsClient.GetRouteDataAsync(
+            Lng, Lat, 
+            EndLng, EndLat, 
+            transportType);
+
+        return routeData;
+    }
 }

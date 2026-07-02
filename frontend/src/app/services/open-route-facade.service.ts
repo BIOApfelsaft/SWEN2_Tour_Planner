@@ -1,24 +1,24 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ApiConfiguration } from '../api/api-configuration';
 
-export interface RouteCalculationResult {
-  distance: number;
-  estimatedTime: number;
-  geoJson: any;
-}
+import { apiTourCalculateGet } from '../api/fn/tour/api-tour-calculate-get';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OpenRouteFacadeService {
-  // Mockdata
-  calculateRoute(start: string, end: string, type: string): Observable<RouteCalculationResult> {
-    const mockResult: RouteCalculationResult = {
-      distance: Math.floor(Math.random() * 50) + 5,
-      estimatedTime: Math.floor(Math.random() * 14400) + 3600,
-      geoJson: null
-    };
+  private http = inject(HttpClient);
+  private config = inject(ApiConfiguration);
 
-    return of(mockResult).pipe(delay(800));
+  calculateRoute(start: string, end: string, transportType: string): Observable<any> {
+    
+    return apiTourCalculateGet(this.http, this.config.rootUrl, { 
+      start: start, 
+      end: end, 
+      transportType: transportType 
+    });
+    
   }
 }

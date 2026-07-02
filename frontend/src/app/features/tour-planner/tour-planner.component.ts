@@ -116,7 +116,7 @@ private loadTourForEdit(id: number) {
       this.estimatedTime.set(Number(tour.estimatedTime));
       this.startLocationSignal.set(String(tour.startLocation));
 
-      setTimeout(() => this.mapFacade.drawMockRoute(), 500);
+      setTimeout(() => this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', tour.routeGeojson), 500);
     }
   }
 
@@ -134,7 +134,7 @@ private loadTourForEdit(id: number) {
       this.openRouteFacade.calculateRoute(start, end, type).subscribe((result) => {
         this.distance.set(result.distance);
         this.estimatedTime.set(result.estimatedTime);
-        this.mapFacade.drawMockRoute();
+        this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', result.routeGeojson);
         this.isCalculating.set(false);
       });
     }
@@ -180,6 +180,6 @@ private loadTourForEdit(id: number) {
   }
 
   ngOnDestroy() {
-    this.mapFacade.destroyMap();
+    this.mapFacade.destroyMap(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container');
   }
 }

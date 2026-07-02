@@ -120,7 +120,7 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.mapFacade.destroyMap();
+    this.mapFacade.destroyMap(this.tour() ? `leaflet-map-${this.tour()?.id}` : '');
   }
 
   toNumber(value: any): number {

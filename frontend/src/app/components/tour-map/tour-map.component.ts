@@ -59,14 +59,14 @@ export class TourMapComponent implements OnDestroy {
 
         setTimeout(() => {
           this.mapFacade.initMap(mapId);
-          this.mapFacade.drawMockRoute();
+          this.mapFacade.drawRoute(mapId, currentTour.routeGeojson);
         }, 0);
       }
     });
   }
 
   ngOnDestroy(): void {
-    this.mapFacade.destroyMap();
+    this.mapFacade.destroyMap(`leaflet-map-${this.tour().id}`);
   }
 
   toNumber(value: any): number {
