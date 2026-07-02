@@ -6,11 +6,11 @@ namespace TourPlannerAPI.Services;
 public class TourService(
     ILogger<TourService> logger,
     ITourRepository tourRepository,
-    OpenRouteServiceClient orsClient) : ITourService
+    IOpenRouteService orsClient) : ITourService
 {
     private readonly ILogger<TourService> _logger = logger;
     private readonly ITourRepository _tourRepository = tourRepository;
-    private readonly OpenRouteServiceClient _orsClient = orsClient;
+    private readonly IOpenRouteService _orsClient = orsClient;
 
     public async Task<IEnumerable<Tour>> GetAllToursAsync()
     {

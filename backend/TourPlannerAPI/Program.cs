@@ -1,32 +1,44 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 using TourPlannerAPI.Data;
 using TourPlannerAPI.Repositories;
 using TourPlannerAPI.Services;
-using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+// ==========================================
+// 1. Core Framework & Utility Services
+// ==========================================
 builder.Services.AddControllers();
-
+builder.Services.AddOpenApi();
+builder.Services.AddMemoryCache();
 builder.Logging.AddLog4Net("log4net.config");
 
-builder.Services.AddMemoryCache();
-
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITourRepository, TourRepository>();
-builder.Services.AddScoped<ITourService, TourService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();
-builder.Services.AddScoped<ITourLogService, TourLogService>();
-
+// ==========================================
+// 2. Database Configuration
+// ==========================================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// ==========================================
+// 3. CORS Configuration
+// ==========================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularFrontend",
+        policy => policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
+// ==========================================
+// 4. Authentication & Authorization
+// ==========================================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -46,20 +58,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularFrontend",
-        policy => policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
-});
+// ==========================================
+// 5. Dependency Injection (Domain Services)
+// ==========================================
+// Auth & Users
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddHttpClient<OpenRouteServiceClient>();
+// Tours
+builder.Services.AddScoped<ITourRepository, TourRepository>();
+builder.Services.AddScoped<ITourService, TourService>();
 
+// Tour Logs
+builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();
+builder.Services.AddScoped<ITourLogService, TourLogService>();
+
+// External API Clients (Using strongly-typed HttpClients)
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();
+builder.Services.AddHttpClient<IOpenRouteService, OpenRouteServiceClient>(); // Correctly mapped interface to implementation!
+
+// ==========================================
+// 6. Application Pipeline Build
+// ==========================================
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -67,14 +91,16 @@ if (app.Environment.IsDevelopment())
     {
         options.Title = "Tour Planner API";
         options.DarkMode = true;
-        options.DefaultHttpClient = new (ScalarTarget.CSharp, ScalarClient.HttpClient);
+        options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }
 
 app.UseHttpsRedirection();
 
+// Custom Middleware (Placed early to ensure it logs the whole lifecycle)
 app.UseMiddleware<LoggingMiddleware>();
 
+// CORS must be placed BEFORE Auth and Controllers
 app.UseCors("AllowAngularFrontend");
 
 app.UseAuthentication();
