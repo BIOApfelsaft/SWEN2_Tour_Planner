@@ -8,6 +8,7 @@ export type { LoginRequest } from './models/login-request';
 export type { LoginResponse } from './models/login-response';
 export type { RegisterRequest } from './models/register-request';
 export type { RegisterResponse } from './models/register-response';
+export type { RouteCalculationResponse } from './models/route-calculation-response';
 export type { Tour } from './models/tour';
 export type { TourLog } from './models/tour-log';
 export type { TourLogResponse } from './models/tour-log-response';

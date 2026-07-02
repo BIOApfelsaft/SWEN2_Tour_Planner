@@ -7,15 +7,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { RouteCalculationResponse } from '../../models/route-calculation-response';
 
-export interface ApiTourCalculateGet$Params {
+export interface ApiTourCalculateGet$Plain$Params {
   start?: string;
   end?: string;
   transportType?: string;
 }
 
-export function apiTourCalculateGet(http: HttpClient, rootUrl: string, params?: ApiTourCalculateGet$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, apiTourCalculateGet.PATH, 'get');
+export function apiTourCalculateGet$Plain(http: HttpClient, rootUrl: string, params?: ApiTourCalculateGet$Plain$Params, context?: HttpContext): Observable<StrictHttpResponse<RouteCalculationResponse>> {
+  const rb = new RequestBuilder(rootUrl, apiTourCalculateGet$Plain.PATH, 'get');
   if (params) {
     rb.query('start', params.start, {});
     rb.query('end', params.end, {});
@@ -23,13 +24,13 @@ export function apiTourCalculateGet(http: HttpClient, rootUrl: string, params?: 
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
+    rb.build({ responseType: 'text', accept: 'text/plain', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      return r as StrictHttpResponse<RouteCalculationResponse>;
     })
   );
 }
 
-apiTourCalculateGet.PATH = '/api/Tour/calculate';
+apiTourCalculateGet$Plain.PATH = '/api/Tour/calculate';

@@ -94,15 +94,23 @@ export class TourLogModalComponent implements OnInit {
     const existingLog = this.log();
 
     if (existingLog) {
-      // Setup Edit Mode
-      const startDateObj = new Date(Number(existingLog.logDateTime));
-      const endDateObj = new Date(startDateObj.getTime() + Number(existingLog.totalTime) * 1000);
+      const safeDateString = existingLog.logDateTime || new Date().toISOString();
+      const start = new Date(safeDateString);
+      
+      const safeTotalTime = existingLog.totalTime || 0;
+      const end = new Date(start.getTime() + (Number(safeTotalTime) * 1000));
+
+      const startDateStr = start.toISOString().split('T')[0];
+      const startTimeStr = start.toTimeString().substring(0, 5);
+      
+      const endDateStr = end.toISOString().split('T')[0];
+      const endTimeStr = end.toTimeString().substring(0, 5);
 
       this.logForm.patchValue({
-        startDate: startDateObj.toISOString().split('T')[0],
-        startTime: startDateObj.toTimeString().substring(0, 5),
-        endDate: endDateObj.toISOString().split('T')[0],
-        endTime: endDateObj.toTimeString().substring(0, 5),
+        startDate: startDateStr,
+        startTime: startTimeStr,
+        endDate: endDateStr,
+        endTime: endTimeStr,
         distance: Number(existingLog.totalDistance),
         difficulty: Number(existingLog.difficulty),
         rating: Number(existingLog.rating),

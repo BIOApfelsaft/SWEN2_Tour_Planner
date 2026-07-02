@@ -99,7 +99,7 @@ namespace TourPlannerAPI.Controllers
         }
 
         [HttpGet("calculate")]
-        public async Task<IActionResult> CalculateRoutePreview([FromQuery] string start, [FromQuery] string end, [FromQuery] string transportType)
+        public async Task<ActionResult<RouteCalculationResponse>> CalculateRoutePreview([FromQuery] string start, [FromQuery] string end, [FromQuery] string transportType)
         {
             try
             {

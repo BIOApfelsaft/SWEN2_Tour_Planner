@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using TourPlannerAPI.Models;
 using TourPlannerAPI.DTOs.Users;
 using TourPlannerAPI.Services;
 using Microsoft.AspNetCore.Authorization;

@@ -132,9 +132,9 @@ private loadTourForEdit(id: number) {
     if (start && end && type) {
       this.isCalculating.set(true);
       this.openRouteFacade.calculateRoute(start, end, type).subscribe((result) => {
-        this.distance.set(result.distance);
-        this.estimatedTime.set(result.estimatedTime);
-        this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', result.routeGeojson);
+        this.distance.set(Number(result.distance));
+        this.estimatedTime.set(Number(result.estimatedTime));
+        this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', result.geoJson);
         this.isCalculating.set(false);
       });
     }
