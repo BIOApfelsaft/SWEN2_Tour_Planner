@@ -4,11 +4,12 @@ import { TourCardComponent } from '../../components/tour-card/tour-card.componen
 import { DashboardStatistic } from '../../models/stat.model';
 import { TourStateService } from '../../services/tour-state.service';
 import { StatsService } from '../../services/stats.service';
+import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatisticCardComponent, TourCardComponent],
+  imports: [StatisticCardComponent, TourCardComponent, SearchBarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.component.html',
 })

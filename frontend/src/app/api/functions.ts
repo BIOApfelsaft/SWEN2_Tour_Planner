@@ -13,6 +13,10 @@ export type { ApiAuthLoginPost$Plain$Params as ApiAuthLoginPost$Plain$Params } f
 export { apiAuthLoginPost$Plain as apiAuthLoginPost$Plain } from './fn/auth/api-auth-login-post-plain';
 export type { ApiAuthLoginPost$Json$Params as ApiAuthLoginPost$Json$Params } from './fn/auth/api-auth-login-post-json';
 export { apiAuthLoginPost$Json as apiAuthLoginPost$Json } from './fn/auth/api-auth-login-post-json';
+export type { ApiSearchGet$Plain$Params as ApiSearchGet$Plain$Params } from './fn/search/api-search-get-plain';
+export { apiSearchGet$Plain as apiSearchGet$Plain } from './fn/search/api-search-get-plain';
+export type { ApiSearchGet$Json$Params as ApiSearchGet$Json$Params } from './fn/search/api-search-get-json';
+export { apiSearchGet$Json as apiSearchGet$Json } from './fn/search/api-search-get-json';
 export type { ApiTourLogsTourTourIdGet$Plain$Params as ApiTourLogsTourTourIdGet$Plain$Params } from './fn/tour-logs/api-tour-logs-tour-tour-id-get-plain';
 export { apiTourLogsTourTourIdGet$Plain as apiTourLogsTourTourIdGet$Plain } from './fn/tour-logs/api-tour-logs-tour-tour-id-get-plain';
 export type { ApiTourLogsTourTourIdGet$Json$Params as ApiTourLogsTourTourIdGet$Json$Params } from './fn/tour-logs/api-tour-logs-tour-tour-id-get-json';

@@ -23,6 +23,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();
 builder.Services.AddScoped<ITourLogService, TourLogService>();
+builder.Services.AddScoped<ISearchRepository, SearchRepository>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
