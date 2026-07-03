@@ -74,6 +74,10 @@ builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();
 builder.Services.AddScoped<ITourLogService, TourLogService>();
 
+// Search
+builder.Services.AddScoped<ISearchRepository, SearchRepository>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+
 // External API Clients (Using strongly-typed HttpClients)
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddHttpClient<IOpenRouteService, OpenRouteServiceClient>(); // Correctly mapped interface to implementation!

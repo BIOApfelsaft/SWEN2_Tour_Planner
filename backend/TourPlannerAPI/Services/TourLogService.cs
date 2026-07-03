@@ -32,7 +32,7 @@ public class TourLogService(
         log.UpdatedAt = DateTime.Now;
 
         await _tourLogRepository.AddTourLogAsync(log);
-        await RecalculateTourScoresAsync(log.TourId);
+        await CalculateTourScoresAsync(log.TourId);
         
         return log;
     }
@@ -44,7 +44,7 @@ public class TourLogService(
         updatedLog.UpdatedAt = DateTime.Now;
 
         await _tourLogRepository.UpdateTourLogAsync(updatedLog);
-        await RecalculateTourScoresAsync(updatedLog.TourId);
+        await CalculateTourScoresAsync(updatedLog.TourId);
         
         return true;
     }
@@ -58,18 +58,40 @@ public class TourLogService(
         {
             int tourId = tourLog.TourId;
             await _tourLogRepository.DeleteTourLogAsync(id);
-            await RecalculateTourScoresAsync(tourId);
+            await CalculateTourScoresAsync(tourId);
         }
     }
 
-    private async Task RecalculateTourScoresAsync(int tourId)
+    public async Task CalculateTourScoresAsync(int tourId)
     {
         var logs = await _tourLogRepository.GetTourLogsAsync(tourId);
         var tour = await _tourRepository.GetTourByIdAsync(tourId);
 
         if (tour == null) return;
 
-        tour.ComputedPopularityScore = logs.Count();
+        // Popularity Score (Max 100)
+        double popularityScore = 0;
+        var currentDate = DateTime.Now;
+
+        if (logs.Any())
+        {
+            foreach (var log in logs)
+            {
+                var ageInDays = (currentDate - log.LogDateTime).TotalDays;
+                double ageWeight = Math.Max(0.2, 1.0 - (ageInDays / 365.0));
+                popularityScore += 30.0 * ageWeight;
+            }
+        }
+        
+        tour.ComputedPopularityScore = (int)Math.Min(100, Math.Round(popularityScore));
+
+        // Child-Friendly Score (Max 100)
+        double diffScore, timeScore, distanceScore;
+
+        // Define thresholds for child-friendly scoring
+        // Over 20 km or over 4 hours is considered NOT child-friendly
+        const double MaxChildDistanceKm = 20.0;
+        const double MaxChildTimeSeconds = 14400.0; // 4 hours
 
         if (logs.Any())
         {
@@ -77,19 +99,30 @@ public class TourLogService(
             double avgTime = logs.Average(l => l.TotalTime);        
             double avgDistance = logs.Average(l => (double)l.TotalDistance); 
 
-            double diffScore = Math.Max(0, 100 - (avgDifficulty * 20)); 
-            double timeScore = Math.Max(0, 100 - (avgTime / 60.0)); 
-            double distanceScore = Math.Max(0, 100 - (avgDistance)); 
+            // Difficulty: 1 (Easy) = 100%, 5 (Hard) = 0%. Formula: 100 - ((Diff - 1) * 25)
+            diffScore = Math.Max(0, 100 - ((avgDifficulty - 1) * 25.0)); 
             
-            tour.ComputedChildFriendlyScore = (decimal)((diffScore + timeScore + distanceScore) / 3.0);
+            // Time & Distance linear scaling (0 to Max = 100 to 0)
+            timeScore = Math.Max(0, 100 - (avgTime / MaxChildTimeSeconds * 100.0)); 
+            distanceScore = Math.Max(0, 100 - (avgDistance / MaxChildDistanceKm * 100.0)); 
         }
         else
         {
-            tour.ComputedChildFriendlyScore = 0;
+            // If no logs exist, use the tour's base distance and estimated time for scoring
+            double baseDistance = (double)(tour.Distance > 0 ? tour.Distance : 0);
+            double baseTime = tour.EstimatedTime > 0 ? tour.EstimatedTime : 0;
+
+            diffScore = 75.0;
+            timeScore = Math.Max(0, 100 - (baseTime / MaxChildTimeSeconds * 100.0)); 
+            distanceScore = Math.Max(0, 100 - (baseDistance / MaxChildDistanceKm * 100.0)); 
         }
 
+        tour.ComputedChildFriendlyScore = (decimal)Math.Round((diffScore + timeScore + distanceScore) / 3.0, 1);
+
         await _tourRepository.UpdateTourAsync(tour);
-        _logger.LogInformation("Recalculated metrics for TourId: {TourId}. Popularity: {Pop}, Child-Friendly: {Child}", 
+        
+        _logger.LogInformation(
+            "Recalculated metrics for TourId: {TourId}. Popularity: {Pop}/100, Child-Friendly: {Child}/100", 
             tourId, tour.ComputedPopularityScore, tour.ComputedChildFriendlyScore);
     }
 }

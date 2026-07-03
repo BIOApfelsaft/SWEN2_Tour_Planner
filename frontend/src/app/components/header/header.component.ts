@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../api/models/user-response';
 import { ButtonComponent } from '../button/button.component';
+import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, ButtonComponent],
+  imports: [RouterLink, ButtonComponent, SearchBarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header
@@ -30,19 +31,10 @@ import { AuthService } from '../../services/auth.service';
       </div>
 
       <div class="flex items-center gap-2 md:gap-4">
-        <div
-          class="hidden md:flex items-center bg-surface-container-lowest border border-outline-variant rounded-full px-3 py-1.5 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all"
-        >
-          <span class="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
-          <input
-            type="text"
-            placeholder="Search tours..."
-            class="border-none bg-transparent focus:ring-0 p-0 w-48 font-body-sm text-body-sm text-on-surface outline-none placeholder:text-outline"
-          />
+      @if (user(); as currentUser) {
+        <div class="hidden md:flex">
+          <app-search-bar></app-search-bar>
         </div>
-
-        <div class="flex items-center gap-4">
-          @if (user(); as currentUser) {
             <a
               routerLink="/profile"
               class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden hover:border-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center bg-white/5"
@@ -61,7 +53,6 @@ import { AuthService } from '../../services/auth.service';
               </svg>
             </a>
           }
-        </div>
 
         @if (user()) {
           <app-button (click)="authService.logout()" variant="secondary"> Logout </app-button>

@@ -32,7 +32,7 @@ export class ButtonComponent {
   // Computed Signal for class
   combinedClasses = computed(() => {
     const base =
-      'w-full font-title-sm text-title-sm py-3 px-6 rounded-lg transition-colors flex justify-center items-center gap-2';
+      'w-full font-title-sm text-title-sm py-3 px-5 rounded-lg transition-colors flex justify-center items-center gap-2';
 
     if (this.variant() === 'primary') {
       return `${base} bg-primary hover:bg-surface-tint text-on-primary shadow-[0_4px_16px_rgba(84,95,114,0.08)] ${this.disabled() ? 'opacity-50 cursor-not-allowed' : ''}`;
