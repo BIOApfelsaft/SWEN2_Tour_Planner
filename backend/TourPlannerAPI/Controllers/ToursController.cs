@@ -10,9 +10,10 @@ namespace TourPlannerAPI.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class TourController(ITourService tourService) : ControllerBase
+    public class TourController(ITourService tourService, ITourLogService tourLogService) : ControllerBase
     {
         private readonly ITourService _tourService = tourService;
+        private readonly ITourLogService _tourLogService = tourLogService;
 
         private int GetCurrentUserId()
         {
@@ -65,7 +66,11 @@ namespace TourPlannerAPI.Controllers
             var createdTour = await _tourService.CreateTourAsync(
                 newTour, dto.StartLng, dto.StartLat, dto.EndLng, dto.EndLat);
 
-            return CreatedAtAction(nameof(GetAllTours), new { id = createdTour.Id }, MapToResponse(createdTour));
+            await _tourLogService.CalculateTourScoresAsync(createdTour.Id);
+            
+            var result = CreatedAtAction(nameof(GetAllTours), new { id = createdTour.Id }, MapToResponse(createdTour));
+
+            return result;
         }
 
         private static TourResponse MapToResponse(Tour tour)
@@ -108,6 +113,8 @@ namespace TourPlannerAPI.Controllers
             var updatedTour = await _tourService.UpdateTourAsync(id, tourUpdate, dto.StartLng, dto.StartLat, dto.EndLng, dto.EndLat);
             
             if (updatedTour == null) return NotFound();
+
+            await _tourLogService.CalculateTourScoresAsync(updatedTour.Id);
 
             return NoContent();
         }

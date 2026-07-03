@@ -1,8 +1,7 @@
 <div class="flex-1 p-margin pb-24 md:pb-margin flex flex-col gap-xl">
-    
-    <section class="w-full max-w-4xl">
+    <div class="md:hidden">
         <app-search-bar></app-search-bar>
-    </section>
+    </div>
 
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-gutter">
         @for (stat of statistics(); track stat.label) {

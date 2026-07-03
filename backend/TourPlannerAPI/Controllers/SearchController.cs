@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.DTOs.Search;
 using TourPlannerAPI.Models.Search;
 using TourPlannerAPI.Services;
+using System.Security.Claims;
 
 namespace TourPlannerAPI.Controllers
 {
@@ -11,12 +12,21 @@ namespace TourPlannerAPI.Controllers
     {
         private readonly ISearchService _searchService = searchService;
 
+        private int GetCurrentUserId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdString, out int userId) ? userId : 0;
+        }
+
         [HttpGet]
         public async Task<ActionResult<SearchResult>> Search([FromQuery] string term, [FromQuery] string type = "global")
         {
+            var userId = GetCurrentUserId();
+            if (userId == 0) return Unauthorized();
+
             try
             {
-                SearchResultModel model = await _searchService.PerformSearchAsync(term, type);
+                SearchResultModel model = await _searchService.PerformSearchAsync(term, type, userId);
 
                 var dto = new SearchResult
                 {

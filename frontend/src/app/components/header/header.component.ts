@@ -31,10 +31,10 @@ import { AuthService } from '../../services/auth.service';
       </div>
 
       <div class="flex items-center gap-2 md:gap-4">
-        <app-search-bar></app-search-bar>
-
-        <div class="flex items-center gap-4">
-          @if (user(); as currentUser) {
+      @if (user(); as currentUser) {
+        <div class="hidden md:flex">
+          <app-search-bar></app-search-bar>
+        </div>
             <a
               routerLink="/profile"
               class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden hover:border-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center bg-white/5"
@@ -53,7 +53,6 @@ import { AuthService } from '../../services/auth.service';
               </svg>
             </a>
           }
-        </div>
 
         @if (user()) {
           <app-button (click)="authService.logout()" variant="secondary"> Logout </app-button>

@@ -9,4 +9,5 @@ public interface ITourLogService
     Task<TourLog> AddTourLogAsync(TourLog log);
     Task<bool> UpdateTourLogAsync(TourLog updatedLog);
     Task DeleteTourLogAsync(int id);
+    Task CalculateTourScoresAsync(int tourId);
 }

@@ -63,18 +63,18 @@
             <p class="font-body-md text-body-md text-on-surface-variant mb-6">{{ currentTour.description }}</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
-              <div [class]="toNumber(currentTour.computedPopularityScore) > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+              <div [class]="toNumber(currentTour.computedPopularityScore) >= 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
                    class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
                 <span class="material-symbols-outlined mb-2 text-3xl">trending_up</span>
                 <span class="text-xs uppercase tracking-wider font-bold opacity-80">Popularity</span>
                 <span class="font-title-sm">{{ toNumber(currentTour.computedPopularityScore) | number:'1.0-1' }} / 100</span>
               </div>
               
-              <div [class]="toNumber(currentTour.computedChildFriendlyScore) > 60 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
+              <div [class]="toNumber(currentTour.computedChildFriendlyScore) > 50 ? 'bg-primary-container text-on-primary-container' : 'bg-error-container text-on-error-container'" 
                    class="p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
                 <span class="material-symbols-outlined mb-2 text-3xl">family_restroom</span>
                 <span class="text-xs uppercase tracking-wider font-bold opacity-80">Child-friendly</span>
-                <span class="font-title-sm">{{ toNumber(currentTour.computedChildFriendlyScore) > 60 ? 'Yes' : 'No' }}</span>
+                <span class="font-title-sm">{{ toNumber(currentTour.computedChildFriendlyScore) > 50 ? 'Yes' : 'No' }}</span>
               </div>
             </div>
           </div>
