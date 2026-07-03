@@ -14,26 +14,42 @@ namespace TourPlannerAPI.Controllers
     {
         private readonly ITourService _tourService = tourService;
 
+        private int GetCurrentUserId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdString, out int userId) ? userId : 0;
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tour>>> GetAllTours()
         {
+            var userId = GetCurrentUserId();
+            if (userId == 0) return Unauthorized();
+
             var tours = await _tourService.GetAllToursAsync();
-            return Ok(tours);
+            var myTours = tours.Where(t => t.UserId == userId);
+            
+            return Ok(myTours);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Tour>> GetTourById(int id)
         {
+            var userId = GetCurrentUserId();
             var tour = await _tourService.GetTourByIdAsync(id);
+            
             if (tour == null) return NotFound();
+
+            if (tour.UserId != userId) return Forbid(); 
+
             return Ok(tour);
         }
 
         [HttpPost]
         public async Task<ActionResult<TourResponse>> CreateTour([FromBody] CreateTourRequest dto)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+            var userId = GetCurrentUserId();
+            if (userId == 0) return Unauthorized();
 
             var newTour = new Tour
             {
@@ -74,6 +90,12 @@ namespace TourPlannerAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTour(int id, [FromBody] CreateTourRequest dto)
         {
+            var userId = GetCurrentUserId();
+
+            var existingTour = await _tourService.GetTourByIdAsync(id);
+            if (existingTour == null) return NotFound();
+            if (existingTour.UserId != userId) return Forbid();
+
             var tourUpdate = new Tour
             {
                 Title = dto.Title,
@@ -93,6 +115,12 @@ namespace TourPlannerAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTour(int id)
         {
+            var userId = GetCurrentUserId();
+
+            var existingTour = await _tourService.GetTourByIdAsync(id);
+            if (existingTour == null) return NotFound();
+            if (existingTour.UserId != userId) return Forbid();
+
             Console.WriteLine($"Deleting tour with ID: {id}");
             await _tourService.DeleteTourAsync(id);
             return NoContent();
@@ -114,7 +142,7 @@ namespace TourPlannerAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

@@ -13,6 +13,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MapFacadeService } from '../../services/map-facade.service';
 import { OpenRouteFacadeService } from '../../services/open-route-facade.service';
 import { TourStateService } from '../../services/tour-state.service';
+import { TourCacheService } from '../../services/tour-cache.service';
 import { CreateTourRequest } from '../../api/models/create-tour-request';
 import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
@@ -40,17 +41,18 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private mapFacade = inject(MapFacadeService);
   private openRouteFacade = inject(OpenRouteFacadeService);
+  private tourCacheService = inject(TourCacheService);
 
   public tourState = inject(TourStateService);
 
   // Signals
-  isEditMode = signal<boolean>(false);
+  isEditMode = signal(false);
   editTourId = signal<number | null>(null);
 
-  distance = signal<number>(0);
-  estimatedTime = signal<number>(0);
-  isCalculating = signal<boolean>(false);
-  startLocationSignal = signal<string>('');
+  distance = signal(0);
+  estimatedTime = signal(0);
+  isCalculating = signal(false);
+  startLocationSignal = signal('');
 
   // Form
   plannerForm = this.fb.group({
@@ -77,7 +79,7 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
       this.editTourId.set(Number(idParam));
 
       if (this.tourState.tours().length === 0) {
-          this.tourState.loadTours();
+        this.tourState.loadTours();
       }
       this.loadTourForEdit(Number(idParam));
     }
@@ -93,16 +95,18 @@ export class TourPlannerComponent implements OnInit, OnDestroy {
 
     this.plannerForm
       .get('endLocation')
-      ?.valueChanges.pipe(debounceTime(500))
+      ?.valueChanges.pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => this.triggerRouteCalculation());
+
     this.plannerForm
       .get('transportType')
-      ?.valueChanges.subscribe(() => this.triggerRouteCalculation());
+      ?.valueChanges.pipe(distinctUntilChanged())
+      .subscribe(() => this.triggerRouteCalculation());
   }
 
-private loadTourForEdit(id: number) {
+  private loadTourForEdit(id: number) {
     const tour = this.tourState.tours().find(t => t.id === id);
-    
+
     if (tour) {
       this.plannerForm.patchValue({
         title: tour.title,
@@ -116,7 +120,7 @@ private loadTourForEdit(id: number) {
       this.estimatedTime.set(Number(tour.estimatedTime));
       this.startLocationSignal.set(String(tour.startLocation));
 
-      setTimeout(() => this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', tour.routeGeojson), 500);
+      setTimeout(() => this.mapFacade.drawRoute(this.getMapContainerId(), tour.routeGeojson), 500);
     }
   }
 
@@ -130,14 +134,32 @@ private loadTourForEdit(id: number) {
     const type = this.plannerForm.get('transportType')?.value;
 
     if (start && end && type) {
+      const cacheKey = this.tourCacheService.generateKey(start, end, type);
+      const cachedResult = this.tourCacheService.getRoute(cacheKey);
+
+      if (cachedResult) {
+        this.distance.set(Number(cachedResult.distance));
+        this.estimatedTime.set(Number(cachedResult.estimatedTime));
+        this.mapFacade.drawRoute(this.getMapContainerId(), cachedResult.geoJson);
+        return;
+      }
+
       this.isCalculating.set(true);
+
       this.openRouteFacade.calculateRoute(start, end, type).subscribe((result) => {
         this.distance.set(Number(result.distance));
         this.estimatedTime.set(Number(result.estimatedTime));
-        this.mapFacade.drawRoute(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container', result.geoJson);
+        this.mapFacade.drawRoute(this.getMapContainerId(), result.geoJson);
+
+        this.tourCacheService.saveRoute(cacheKey, result);
+
         this.isCalculating.set(false);
       });
     }
+  }
+
+  private getMapContainerId(): string {
+    return this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container';
   }
 
   saveTour() {
@@ -145,7 +167,7 @@ private loadTourForEdit(id: number) {
 
     this.isCalculating.set(true);
     const formValues = this.plannerForm.value;
-    
+
     const tourData: CreateTourRequest = {
       title: formValues.title || '',
       description: formValues.description || undefined,
@@ -180,6 +202,6 @@ private loadTourForEdit(id: number) {
   }
 
   ngOnDestroy() {
-    this.mapFacade.destroyMap(this.isEditMode() && this.editTourId() ? `leaflet-map-${this.editTourId()}` : 'planner-map-container');
+    this.mapFacade.destroyMap(this.getMapContainerId());
   }
 }

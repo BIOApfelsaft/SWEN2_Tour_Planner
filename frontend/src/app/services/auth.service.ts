@@ -4,6 +4,12 @@ import { Router } from '@angular/router';
 import { firstValueFrom, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { TourStateService } from './tour-state.service';
+import { TourLogStateService } from './tour-log-state.service';
+import { TourCacheService } from './tour-cache.service';
+import { MapFacadeService } from './map-facade.service';
+import { LayoutService } from './layout.service';
+
 import { RegisterRequest } from '../api/models/register-request';
 import { RegisterResponse } from '../api/models/register-response';
 import { LoginRequest } from '../api/models/login-request';
@@ -22,6 +28,12 @@ import { ApiConfiguration } from '../api/api-configuration';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+
+  private tourState = inject(TourStateService);
+  private tourLogState = inject(TourLogStateService);
+  private tourCache = inject(TourCacheService);
+  private mapFacade = inject(MapFacadeService);
+  private layoutService = inject(LayoutService);
   
   private apiConfig = inject(ApiConfiguration);
 
@@ -91,6 +103,13 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('authToken');
+
+    this.tourState.clearState();
+    this.tourLogState.clearState();
+    this.tourCache.clearCache();
+    this.mapFacade.clearState();
+    this.layoutService.closeMenu();
+
     this.router.navigate(['/login']);
   }
 }

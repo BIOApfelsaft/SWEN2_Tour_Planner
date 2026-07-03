@@ -19,3 +19,4 @@ export type { TourSearchResult } from './models/tour-search-result';
 export type { User } from './models/user';
 export type { UserResponse } from './models/user-response';
 export type { UserUpdateRequest } from './models/user-update-request';
+export type { WeatherResponse } from './models/weather-response';
