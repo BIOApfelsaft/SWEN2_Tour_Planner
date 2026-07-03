@@ -93,4 +93,8 @@ export class MapFacadeService {
       }
     }
   }
+
+  clearState(): void {
+    this.routeLayers.forEach((_, mapId) => this.clearRoute(mapId));
+  }
 }

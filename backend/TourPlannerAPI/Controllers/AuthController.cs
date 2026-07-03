@@ -25,7 +25,10 @@ namespace TourPlannerAPI.Controllers
 
             var result = await _authService.RegisterAsync(newUser, dto.Password);
             
-            if (!result) return BadRequest("Username or email already exists.");
+            if (!result) 
+            {
+                return Conflict(new { message = "Username or email already exists." });
+            }
 
             return Ok(new RegisterResponse { Message = "Registered successfully." });
         }
@@ -44,7 +47,10 @@ namespace TourPlannerAPI.Controllers
             
             var token = await _authService.LoginWithChallengeAsync(dto.Username, dto.Password);
             
-            if (token == null) return Unauthorized("Invalid credentials.");
+            if (token == null) 
+            {
+                return Unauthorized(new { message = "Invalid credentials." });
+            }
             
             return Ok(new LoginResponse { Token = token });
         }

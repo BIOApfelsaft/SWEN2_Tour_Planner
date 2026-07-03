@@ -18,7 +18,8 @@ namespace TourPlannerAPI.Services
 
         public async Task<bool> RegisterAsync(User user, string rawPassword)
         {
-            if (await _db.Users.AnyAsync(u => u.Username == user.Username))
+            // Check if either the Username OR the Email already exists in the database
+            if (await _db.Users.AnyAsync(u => u.Username == user.Username || u.Email == user.Email))
                 return false;
     
             user.PasswordHash = ComputeSha256(rawPassword);

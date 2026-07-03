@@ -52,4 +52,8 @@ export class TourLogStateService {
         this.tourState.loadTours(); 
     });
   }
+
+  clearState(): void {
+    this.logs.set([]);
+  }
 }

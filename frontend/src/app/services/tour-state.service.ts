@@ -53,4 +53,8 @@ export class TourStateService {
       })
     );
   }
+
+  clearState(): void {
+    this.tours.set([]);
+  }
 }

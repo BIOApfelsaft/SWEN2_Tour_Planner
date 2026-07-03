@@ -57,3 +57,7 @@ export type { ApiUserMePut$Params as ApiUserMePut$Params } from './fn/user/api-u
 export { apiUserMePut as apiUserMePut } from './fn/user/api-user-me-put';
 export type { ApiUserMeDelete$Params as ApiUserMeDelete$Params } from './fn/user/api-user-me-delete';
 export { apiUserMeDelete as apiUserMeDelete } from './fn/user/api-user-me-delete';
+export type { ApiWeatherLocationGet$Plain$Params as ApiWeatherLocationGet$Plain$Params } from './fn/weather/api-weather-location-get-plain';
+export { apiWeatherLocationGet$Plain as apiWeatherLocationGet$Plain } from './fn/weather/api-weather-location-get-plain';
+export type { ApiWeatherLocationGet$Json$Params as ApiWeatherLocationGet$Json$Params } from './fn/weather/api-weather-location-get-json';
+export { apiWeatherLocationGet$Json as apiWeatherLocationGet$Json } from './fn/weather/api-weather-location-get-json';
