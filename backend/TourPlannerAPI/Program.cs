@@ -78,9 +78,13 @@ builder.Services.AddScoped<ITourLogService, TourLogService>();
 builder.Services.AddScoped<ISearchRepository, SearchRepository>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 
+// Import & Export
+builder.Services.AddScoped<IImportExportRepository, ImportExportRepository>();
+builder.Services.AddScoped<IImportExportService, ImportExportService>();
+
 // External API Clients (Using strongly-typed HttpClients)
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
-builder.Services.AddHttpClient<IOpenRouteService, OpenRouteServiceClient>(); // Correctly mapped interface to implementation!
+builder.Services.AddHttpClient<IOpenRouteService, OpenRouteServiceClient>();
 
 // ==========================================
 // 6. Application Pipeline Build

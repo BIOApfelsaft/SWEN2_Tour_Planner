@@ -8,6 +8,7 @@ import { TourDetailComponent } from './features/tour-details/tour-detail.compone
 import { TourPlannerComponent } from './features/tour-planner/tour-planner.component';
 import { ActivityLogComponent } from './features/activity-log/activity-log.component';
 import { UserProfileComponent } from './features/user-profile/user-profile.component';
+import { ImportExportComponent } from './features/import-export/import-export.component';
 
 export const routes: Routes = [
     { path: "login", component: AuthLayoutComponent, children: [
@@ -36,6 +37,10 @@ export const routes: Routes = [
 
     { path: "profile", component: MainLayoutComponent, children: [
         { path: "", component: UserProfileComponent, canActivate: [authGuard] }
+    ]},
+
+    { path: "data-management", component: MainLayoutComponent, children: [
+        { path: "", component:ImportExportComponent, canActivate: [authGuard] }
     ]},
 
     { path: "**", redirectTo: "login" },

@@ -5,11 +5,13 @@ import { DashboardStatistic } from '../../models/stat.model';
 import { TourStateService } from '../../services/tour-state.service';
 import { StatsService } from '../../services/stats.service';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { ButtonComponent } from '../../components/button/button.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatisticCardComponent, TourCardComponent, SearchBarComponent],
+  imports: [StatisticCardComponent, TourCardComponent, SearchBarComponent, ButtonComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.component.html',
 })

@@ -1,0 +1,58 @@
+<div class="max-w-4xl mx-auto p-4 flex flex-col gap-8 mt-8">
+  
+  <div class="flex justify-between items-end border-b border-outline-variant/50 pb-4">
+    <div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface">Data Management</h1>
+      <p class="text-on-surface-variant mt-2">Export your favorite tours to share them, or import tours from friends.</p>
+    </div>
+    
+    <input type="file" id="fileUpload" accept=".json" class="hidden" (change)="onFileSelected($event)">
+    
+    <button (click)="triggerFileInput()" [disabled]="isImporting()" class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-bold shadow hover:bg-secondary/90 transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined">upload</span>
+      {{ isImporting() ? 'Importing...' : 'Import JSON' }}
+    </button>
+  </div>
+
+  <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/30 p-6 flex flex-col gap-4">
+    <div class="flex justify-between items-center">
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">Select Tours for Export</h2>
+      <span class="text-sm font-bold text-on-primary bg-primary-container px-3 py-1 rounded-full">
+        {{ selectedTourIds().size }} selected
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-2">
+      @for (tour of tours(); track toNumber(tour.id)) {
+        <label class="flex items-start gap-4 p-4 rounded-xl border border-outline-variant/50 cursor-pointer hover:bg-surface-container transition-colors"
+               [class.bg-surface-container-high]="selectedTourIds().has(toNumber(tour.id))">
+          
+          <input type="checkbox" 
+                 class="mt-1 w-5 h-5 accent-primary cursor-pointer"
+                 [checked]="selectedTourIds().has(toNumber(tour.id))"
+                 (change)="toggleTourSelection(toNumber(tour.id))">
+          
+          <div class="flex flex-col">
+            <span class="font-bold text-on-surface">{{ tour.title }}</span>
+            <span class="text-sm text-on-surface-variant">{{ tour.startLocation }} ➔ {{ tour.endLocation }}</span>
+          </div>
+        </label>
+      }
+      @empty {
+        <div class="col-span-2 text-center py-8 text-on-surface-variant">
+          No tours available to export.
+        </div>
+      }
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-outline-variant/50 flex justify-end">
+      <button (click)="exportSelectedTours()" 
+              [disabled]="!hasSelection() || isExporting()"
+              class="px-6 py-3 bg-primary text-on-primary rounded-xl font-bold shadow-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        <span class="material-symbols-outlined">download</span>
+        {{ isExporting() ? 'Generating...' : 'Export Selected Tours' }}
+      </button>
+    </div>
+  </div>
+
+</div>

@@ -13,6 +13,12 @@ export type { ApiAuthLoginPost$Plain$Params as ApiAuthLoginPost$Plain$Params } f
 export { apiAuthLoginPost$Plain as apiAuthLoginPost$Plain } from './fn/auth/api-auth-login-post-plain';
 export type { ApiAuthLoginPost$Json$Params as ApiAuthLoginPost$Json$Params } from './fn/auth/api-auth-login-post-json';
 export { apiAuthLoginPost$Json as apiAuthLoginPost$Json } from './fn/auth/api-auth-login-post-json';
+export type { ApiImportExportExportPost$Plain$Params as ApiImportExportExportPost$Plain$Params } from './fn/import-export/api-import-export-export-post-plain';
+export { apiImportExportExportPost$Plain as apiImportExportExportPost$Plain } from './fn/import-export/api-import-export-export-post-plain';
+export type { ApiImportExportExportPost$Json$Params as ApiImportExportExportPost$Json$Params } from './fn/import-export/api-import-export-export-post-json';
+export { apiImportExportExportPost$Json as apiImportExportExportPost$Json } from './fn/import-export/api-import-export-export-post-json';
+export type { ApiImportExportImportPost$Params as ApiImportExportImportPost$Params } from './fn/import-export/api-import-export-import-post';
+export { apiImportExportImportPost as apiImportExportImportPost } from './fn/import-export/api-import-export-import-post';
 export type { ApiSearchGet$Plain$Params as ApiSearchGet$Plain$Params } from './fn/search/api-search-get-plain';
 export { apiSearchGet$Plain as apiSearchGet$Plain } from './fn/search/api-search-get-plain';
 export type { ApiSearchGet$Json$Params as ApiSearchGet$Json$Params } from './fn/search/api-search-get-json';
