@@ -82,6 +82,10 @@ builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IImportExportRepository, ImportExportRepository>();
 builder.Services.AddScoped<IImportExportService, ImportExportService>();
 
+// Stats
+builder.Services.AddScoped<IStatsRepository, StatsRepository>();
+builder.Services.AddScoped<IStatsService, StatsService>();
+
 // External API Clients (Using strongly-typed HttpClients)
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddHttpClient<IOpenRouteService, OpenRouteServiceClient>();

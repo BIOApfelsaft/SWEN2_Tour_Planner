@@ -1,5 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-import { DashboardStatistic } from '../../models/stat.model';
+import { StatItemResponse } from '../../api/models';
 
 @Component({
   selector: 'app-statistic-card',
@@ -18,5 +18,5 @@ import { DashboardStatistic } from '../../models/stat.model';
   `,
 })
 export class StatisticCardComponent {
-  stat = input.required<DashboardStatistic>();
+  stat = input.required<StatItemResponse>();
 }

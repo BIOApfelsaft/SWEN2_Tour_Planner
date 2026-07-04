@@ -11,6 +11,7 @@ export type { RegisterRequest } from './models/register-request';
 export type { RegisterResponse } from './models/register-response';
 export type { RouteCalculationResponse } from './models/route-calculation-response';
 export type { SearchResult } from './models/search-result';
+export type { StatItemResponse } from './models/stat-item-response';
 export type { Tour } from './models/tour';
 export type { TourExport } from './models/tour-export';
 export type { TourLog } from './models/tour-log';
