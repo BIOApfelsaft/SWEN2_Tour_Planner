@@ -13,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header
-      class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 sticky top-0 z-[40000]"
+      class="bg-on-primary-container border-b shadow-sm flex justify-between items-center w-full px-6 py-3 sticky top-0 z-40000"
     >
       <button
         (click)="layoutService.toggleMenu()"
@@ -33,7 +33,6 @@ import { AuthService } from '../../services/auth.service';
 
       <div class="flex items-center gap-2 md:gap-4">
         @if (user(); as currentUser) {
-          <!-- ADDED: Explicit widths (w-64 lg:w-96) to prevent the search bar from collapsing -->
           <div class="hidden md:block relative w-64 lg:w-96">
             <app-search-bar></app-search-bar>
           </div>
@@ -58,7 +57,6 @@ import { AuthService } from '../../services/auth.service';
         }
 
         @if (user()) {
-          <!-- ADDED: 'shrink-0' to buttons to ensure they never get squished by the flex container -->
           <app-button (click)="authService.logout()" variant="secondary" class="shrink-0"> Logout </app-button>
         }
 

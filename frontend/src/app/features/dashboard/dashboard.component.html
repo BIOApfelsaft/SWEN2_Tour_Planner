@@ -1,6 +1,6 @@
 <div class="flex-1 p-margin pb-24 md:pb-margin flex flex-col gap-xl">
     <div class="md:hidden">
-        <app-search-bar></app-search-bar>
+        <app-search-bar class="z-30"></app-search-bar>
     </div>
 
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-gutter">
@@ -12,6 +12,11 @@
     <section class="flex flex-col gap-md">
         <div class="flex items-center justify-between">
             <h3 class="font-headline-md text-headline-md text-on-surface">My Tours</h3>
+        </div>
+
+        <div class="flex items-center gap-4">
+             <app-button [routerLink]="['/tour-planner']" variant="primary"> New Tour </app-button>
+             <app-button [routerLink]="['/data-management']" variant="secondary"]> Import / Export </app-button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">

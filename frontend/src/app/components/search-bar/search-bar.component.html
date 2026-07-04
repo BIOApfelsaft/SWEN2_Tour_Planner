@@ -8,7 +8,6 @@
     </select>
     
     <!-- The input field -->
-    <!-- Added w-full and flex-1 so it dynamically fills space -->
     <input 
       type="text" 
       formControlName="term" 
@@ -17,7 +16,6 @@
   </form>
 
   <!-- Loading indicator -->
-  <!-- Added w-full left-0 to align it correctly -->
   @if (isSearching()) {
     <div class="absolute w-full left-0 mt-2 p-3 bg-surface shadow-xl rounded-xl text-center text-sm text-on-surface-variant border border-outline-variant z-50">
       Searching...
@@ -27,7 +25,6 @@
     <!-- The results -->
     @if (results(); as res) {
       @if (searchForm.get('term')?.value?.length! > 1) {
-        <!-- Added w-full left-0 z-50 to constrain the width to the parent input -->
         <div class="absolute w-full left-0 mt-2 bg-surface shadow-2xl rounded-xl overflow-hidden border border-outline-variant max-h-96 overflow-y-auto z-50">
           
           <!-- Tour Results -->

@@ -57,8 +57,8 @@ export class SearchBarComponent {
 
   goToTour(tourId: number | undefined) {
     if (tourId) {
-      this.router.navigate(['/tour', tourId]);
       this.searchForm.patchValue({ term: '' }); 
+      this.router.navigate(['/tour', tourId]);
     }
   }
 

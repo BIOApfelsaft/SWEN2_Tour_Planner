@@ -6,11 +6,13 @@ namespace TourPlannerAPI.Services;
 public class TourService(
     ILogger<TourService> logger,
     ITourRepository tourRepository,
-    IOpenRouteService orsClient) : ITourService
+    IOpenRouteService orsClient, 
+    ITourLogService tourLogService) : ITourService
 {
     private readonly ILogger<TourService> _logger = logger;
     private readonly ITourRepository _tourRepository = tourRepository;
     private readonly IOpenRouteService _orsClient = orsClient;
+    private readonly ITourLogService _tourLogService = tourLogService;
 
     public async Task<IEnumerable<Tour>> GetAllToursAsync()
     {
@@ -52,7 +54,11 @@ public class TourService(
         tour.CreatedAt = DateTime.Now;
         tour.UpdatedAt = DateTime.Now;
 
-        return await _tourRepository.CreateTourAsync(tour);
+        var result = await _tourRepository.CreateTourAsync(tour);
+        
+        await _tourLogService.CalculateTourScoresAsync(result.Id);
+
+        return result;
     }
 
     public async Task<Tour?> UpdateTourAsync(int id, Tour updatedData, double startLng, double startLat, double endLng, double endLat)
@@ -97,6 +103,9 @@ public class TourService(
         existingTour.UpdatedAt = DateTime.Now; 
 
         await _tourRepository.UpdateTourAsync(existingTour);
+
+        await _tourLogService.CalculateTourScoresAsync(existingTour.Id);
+
         return existingTour;
     }
 

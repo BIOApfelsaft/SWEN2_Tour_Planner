@@ -19,7 +19,7 @@ import { MapFacadeService } from '../../services/map-facade.service';
     <div
       class="relative w-full rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container min-h-100"
     >
-      <div id="leaflet-map-{{ tour().id }}" class="absolute inset-0 w-full h-full z-0"></div>
+      <div [id]="mapId" class="absolute inset-0 w-full h-full z-0"></div>
 
       <img
         [src]="tour().mapImagePath"
@@ -40,6 +40,7 @@ import { MapFacadeService } from '../../services/map-facade.service';
             Est. Time
           </div>
           <div class="font-title-sm text-on-surface">
+            <!-- Beispiel mit der toNumber Funktion, die du drin hattest: -->
             {{ toNumber(tour().estimatedTime) / 3600 | number: '1.0-1' }} hrs
           </div>
         </div>
@@ -51,22 +52,26 @@ export class TourMapComponent implements OnDestroy {
   tour = input.required<TourResponse>();
   private mapFacade = inject(MapFacadeService);
 
+  readonly mapId = 'tour-map-' + Math.random().toString(36).substring(2, 9);
+
   constructor() {
     effect(() => {
       const currentTour = this.tour();
+      
       if (currentTour) {
-        const mapId = `leaflet-map-${currentTour.id}`;
-
         setTimeout(() => {
-          this.mapFacade.initMap(mapId);
-          this.mapFacade.drawRoute(mapId, currentTour.routeGeojson);
-        }, 0);
+          this.mapFacade.initMap(this.mapId);
+          
+          if (currentTour.routeGeojson) {
+            this.mapFacade.drawRoute(this.mapId, currentTour.routeGeojson);
+          }
+        }, 10);
       }
     });
   }
 
   ngOnDestroy(): void {
-    this.mapFacade.destroyMap(`leaflet-map-${this.tour().id}`);
+    this.mapFacade.destroyMap(this.mapId);
   }
 
   toNumber(value: any): number {

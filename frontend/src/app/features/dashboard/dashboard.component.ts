@@ -1,15 +1,17 @@
 import { Component, computed, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { StatisticCardComponent } from '../../components/statistic-card/statistic-card.component';
 import { TourCardComponent } from '../../components/tour-card/tour-card.component';
-import { DashboardStatistic } from '../../models/stat.model';
 import { TourStateService } from '../../services/tour-state.service';
 import { StatsService } from '../../services/stats.service';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { ButtonComponent } from '../../components/button/button.component';
+import { RouterLink } from '@angular/router';
+import { StatItemResponse } from '../../api/models';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatisticCardComponent, TourCardComponent, SearchBarComponent],
+  imports: [StatisticCardComponent, TourCardComponent, SearchBarComponent, ButtonComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.component.html',
 })
@@ -17,7 +19,7 @@ export class DashboardComponent implements OnInit {
   public tourState = inject(TourStateService);
   private statsService = inject(StatsService);
 
-  statistics = signal<DashboardStatistic[]>([]);
+  statistics = signal<StatItemResponse[]>([]);
   plannedTours = computed(() => this.tourState.tours());
 
   ngOnInit(): void {

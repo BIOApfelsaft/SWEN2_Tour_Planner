@@ -51,26 +51,17 @@ export class TourDetailComponent implements OnInit, OnDestroy {
   isAddingLog = signal<Boolean>(false);
   selectedLogToEdit = signal<TourLogResponse | null>(null);
 
-  constructor() {
-    // effect init map when tour data is loaded
-    effect(() => {
-      if (this.tour()) {
-        setTimeout(() => {
-          this.mapFacade.initMap(`leaflet-map-${this.tour()?.id}`);
-        }, 0);
-      }
-    });
-  }
-
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.currentTourId.set(id);
-
-    if (this.tourState.tours().length === 0) {
-      this.tourState.loadTours();
-    }
-
-    this.tourLogState.loadLogsForTour(id);
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      this.currentTourId.set(id);
+  
+      if (this.tourState.tours().length === 0) {
+        this.tourState.loadTours();
+      }
+  
+      this.tourLogState.loadLogsForTour(id);
+    });
   }
 
   editTour() {
