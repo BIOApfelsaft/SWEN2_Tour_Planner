@@ -1,67 +1,70 @@
-<div class="relative max-w-xl mx-auto z-50 w-full">
-    <form [formGroup]="searchForm" class="flex gap-2">
+<div class="relative w-full z-50">
+  <form [formGroup]="searchForm" class="flex gap-2 w-full">
     <!-- Dropdown for search type -->
-    <select formControlName="type" class="p-3 border border-outline rounded-xl bg-surface text-on-surface focus:ring-2 focus:ring-primary outline-none">
-        <option value="global">All</option>
-        <option value="tour">Tours</option>
-        <option value="log">Logs</option>
+    <select formControlName="type" class="p-3 border border-outline rounded-xl bg-surface text-on-surface focus:ring-2 focus:ring-primary outline-none shrink-0">
+      <option value="global">All</option>
+      <option value="tour">Tours</option>
+      <option value="log">Logs</option>
     </select>
     
     <!-- The input field -->
+    <!-- Added w-full and flex-1 so it dynamically fills space -->
     <input 
-        type="text" 
-        formControlName="term" 
-        placeholder="Search tours, locations, logs..." 
-        class="p-3 border border-outline rounded-xl focus:ring-2 focus:ring-primary outline-none bg-surface text-on-surface">
-    </form>
+      type="text" 
+      formControlName="term" 
+      placeholder="Search tours, locations, logs..." 
+      class="w-full flex-1 p-3 border border-outline rounded-xl focus:ring-2 focus:ring-primary outline-none bg-surface text-on-surface">
+  </form>
 
-    <!-- Loading indicator -->
-    @if (isSearching()) {
-    <div class="absolute mt-2 p-3 bg-surface shadow-xl rounded-xl text-center text-sm text-on-surface-variant border border-outline-variant">
-        Searching...
+  <!-- Loading indicator -->
+  <!-- Added w-full left-0 to align it correctly -->
+  @if (isSearching()) {
+    <div class="absolute w-full left-0 mt-2 p-3 bg-surface shadow-xl rounded-xl text-center text-sm text-on-surface-variant border border-outline-variant z-50">
+      Searching...
     </div>
-    } @else {
+  } @else {
 
-        <!-- The results -->
-        @if (results(); as res) {
-            @if (searchForm.get('term')?.value?.length! > 1) {
-                <div class="absolute mt-2 bg-surface shadow-2xl rounded-xl overflow-hidden border border-outline-variant max-h-96 overflow-y-auto">
-                
-                <!-- Tour Results -->
-                @if (res.tours && res.tours.length > 0) {
-                    <div class="bg-surface-container-low py-1 px-4 font-bold text-xs tracking-wider uppercase text-primary">Tours</div>
-                    <ul>
-                    @for (tour of res.tours; track toNumber(tour.id)) {
-                        <li (click)="goToTour(toNumber(tour.id))" class="p-3 hover:bg-surface-container cursor-pointer border-b border-outline-variant/30 transition-colors">
-                        <div class="font-semibold text-on-surface">{{ tour.title }}</div>
-                        <div class="text-sm text-on-surface-variant truncate">{{ tour.description || 'No description available' }}</div>
-                        </li>
-                    }
-                    </ul>
-                }
+    <!-- The results -->
+    @if (results(); as res) {
+      @if (searchForm.get('term')?.value?.length! > 1) {
+        <!-- Added w-full left-0 z-50 to constrain the width to the parent input -->
+        <div class="absolute w-full left-0 mt-2 bg-surface shadow-2xl rounded-xl overflow-hidden border border-outline-variant max-h-96 overflow-y-auto z-50">
+          
+          <!-- Tour Results -->
+          @if (res.tours && res.tours.length > 0) {
+            <div class="bg-surface-container-low py-1 px-4 font-bold text-xs tracking-wider uppercase text-primary">Tours</div>
+            <ul>
+              @for (tour of res.tours; track toNumber(tour.id)) {
+                <li (click)="goToTour(toNumber(tour.id))" class="p-3 hover:bg-surface-container cursor-pointer border-b border-outline-variant/30 transition-colors">
+                  <div class="font-semibold text-on-surface">{{ tour.title }}</div>
+                  <div class="text-sm text-on-surface-variant truncate">{{ tour.description || 'No description available' }}</div>
+                </li>
+              }
+            </ul>
+          }
 
-                <!-- Log Results -->
-                @if (res.logs && res.logs.length > 0) {
-                    <div class="bg-surface-container-low py-1 px-4 font-bold text-xs tracking-wider uppercase text-primary">Tour Logs</div>
-                    <ul>
-                    @for (log of res.logs; track toNumber(log.id)) {
-                        <li (click)="goToTour(toNumber(log.tourId))" class="p-3 hover:bg-surface-container cursor-pointer border-b border-outline-variant/30 transition-colors">
-                        <div class="text-xs text-on-surface-variant">Log in <span class="font-semibold text-on-surface">{{ log.tourTitle }}</span></div>
-                        <div class="text-sm text-on-surface italic truncate mt-1">"...{{ log.comment }}..."</div>
-                        </li>
-                    }
-                    </ul>
-                }
+          <!-- Log Results -->
+          @if (res.logs && res.logs.length > 0) {
+            <div class="bg-surface-container-low py-1 px-4 font-bold text-xs tracking-wider uppercase text-primary">Tour Logs</div>
+            <ul>
+              @for (log of res.logs; track toNumber(log.id)) {
+                <li (click)="goToTour(toNumber(log.tourId))" class="p-3 hover:bg-surface-container cursor-pointer border-b border-outline-variant/30 transition-colors">
+                  <div class="text-xs text-on-surface-variant">Log in <span class="font-semibold text-on-surface">{{ log.tourTitle }}</span></div>
+                  <div class="text-sm text-on-surface italic truncate mt-1">"...{{ log.comment }}..."</div>
+                </li>
+              }
+            </ul>
+          }
 
-                <!-- No Results -->
-                @if (res.tours?.length === 0 && res.logs?.length === 0) {
-                    <div class="p-6 text-center text-on-surface-variant">
-                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">search_off</span>
-                    <p>No results found.</p>
-                    </div>
-                }
-                </div>
-            }
-        }
+          <!-- No Results -->
+          @if (res.tours?.length === 0 && res.logs?.length === 0) {
+            <div class="p-6 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-4xl mb-2 opacity-50">search_off</span>
+              <p>No results found.</p>
+            </div>
+          }
+        </div>
+      }
     }
+  }
 </div>

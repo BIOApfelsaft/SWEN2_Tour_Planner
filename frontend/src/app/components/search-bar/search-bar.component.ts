@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs'; // 'of' hinzugefügt!
+import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { SearchResult } from '../../api/models/search-result';
@@ -10,7 +10,7 @@ import { SearchService } from '../../services/search.service';
   selector: 'app-search-bar',
   standalone: true,
   imports: [ReactiveFormsModule],
-  templateUrl: './search-bar.component.html',
+  templateUrl: './search-bar.component.html'
 })
 export class SearchBarComponent {
   private router = inject(Router);
