@@ -11,14 +11,16 @@ A web application for creating, managing and tracking tours and tour logs (bike,
 * [Angular](https://angular.io/) (Standalone Components, MVVM Architecture)
 * [Leaflet](https://leafletjs.com/) (Interactive Maps)
 * [Tailwind CSS v4](https://tailwindcss.com/) (Styling)
+* [OpenAPI Generator] (typed API clients)
 
 **Backend:**
 * [ASP.NET Core (C#)](https://dotnet.microsoft.com/apps/aspnet) (REST API)
 * [OpenRouteService API](https://openrouteservice.org/) (Route & Distance Calculation)
+* [OpenMeteo API](https://open-meteo.com/) (Real-time weather data)
 
 **Database & Storage:**
 * [PostgreSQL](https://www.postgresql.org/) (Hosted via Docker)
-* Local Filesystem (For uploading and serving tour images; file paths are stored in the DB)
+* [EntityFrameworkCore](https://learn.microsoft.com/en-us/ef/core/) (ORM)
 
 ---
 
@@ -58,12 +60,13 @@ docker-compose up -d
 cd backend/TourPlannerAPI
 dotnet run
 ```
-The Swagger API documentation will be available at http://localhost:5134/scalar.
+The Scalar API documentation will be available at http://localhost:5134/scalar.
 
 ### 6. Frontend Setup and Start (Second terminal)
 ```bash
 cd frontend
 npm install
+npm run generate-api # Generates the OpenAPI client based on the backend
 ng serve
 ```
 
@@ -74,9 +77,10 @@ ng serve
 TourPlanner/
 ├── backend/                  # ASP.NET Core Web API
 │   ├── TourPlannerAPI/       # Main project (Controllers, Services, Models)
+├── docs/                     # Detailed Documentation of the project
 ├── frontend/                 # Angular Application
 │   ├── src/
-│   │   ├── app/              # Standalone Components & MVVM ViewModels
+│   │   ├── app/              # Standalone Components, MVVM ViewModels & Services
 ├── docker-compose.yml        # PostgreSQL database configuration
 └── README.md
 ```

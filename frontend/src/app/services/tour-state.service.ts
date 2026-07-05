@@ -24,7 +24,7 @@ export class TourStateService {
   loadTours(): void {
     apiTourGet$Json(this.http, this.config.rootUrl).subscribe({
       next: (data) => this.tours.set(data.body || []),
-      error: (err) => console.error('Fehler beim Laden der Touren:', err)
+      error: (err) => console.error('Failed to load the tours:', err)
     });
   }
 
