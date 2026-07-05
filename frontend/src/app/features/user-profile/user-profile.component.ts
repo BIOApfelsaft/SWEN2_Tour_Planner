@@ -79,7 +79,7 @@ export class UserProfileComponent implements OnInit {
       })
       .catch((error) => {
         console.error('Failed to delete account', error);
-        this.apiErrorMessage.set('Fehler beim Löschen des Kontos.');
+        this.apiErrorMessage.set('Failed to delete account.');
       })
       .finally(() => {
         this.isSaving.set(false);
