@@ -109,10 +109,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Custom Middleware (Placed early to ensure it logs the whole lifecycle)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
-
-// CORS must be placed BEFORE Auth and Controllers
 app.UseCors("AllowAngularFrontend");
 
 app.UseAuthentication();
