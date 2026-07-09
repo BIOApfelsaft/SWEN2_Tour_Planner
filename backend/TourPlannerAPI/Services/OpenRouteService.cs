@@ -3,14 +3,17 @@ using System.Text.Json;
 
 namespace TourPlannerAPI.Services
 {
-    public class OpenRouteServiceClient(HttpClient httpClient, IConfiguration config) : IOpenRouteService
+    public class OpenRouteServiceClient(ILogger<OpenRouteServiceClient> logger, HttpClient httpClient, IConfiguration config) : IOpenRouteService
     {
+        private readonly ILogger<OpenRouteServiceClient> _logger = logger;
         private readonly HttpClient _httpClient = httpClient;
         private readonly string _apiKey = config["ORS:ApiKey"] ?? throw new ArgumentNullException("ORS ApiKey missing");
 
         public async Task<(decimal distance, int time, string geoJson)> GetRouteDataAsync(double startLng, double startLat, double endLng, double endLat, string profile = "driving-car")
         {
             string orsProfile = MapToOrsProfile(profile);
+            _logger.LogInformation("Fetching ORS route data using profile: {Profile}", orsProfile);
+            
             var url = $"https://api.openrouteservice.org/v2/directions/{orsProfile}/geojson";
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _apiKey);
@@ -26,6 +29,11 @@ namespace TourPlannerAPI.Services
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(url, content);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("ORS routing API failed with status code: {StatusCode}", response.StatusCode);
+            }
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -45,20 +53,28 @@ namespace TourPlannerAPI.Services
 
         public async Task<(double Lng, double Lat)> GetCoordinatesAsync(string address)
         {
+            _logger.LogInformation("Fetching coordinates for address: {Address}", address);
+            
             var url = $"https://api.openrouteservice.org/geocode/search?api_key={_apiKey}&text={Uri.EscapeDataString(address)}";
             
             _httpClient.DefaultRequestHeaders.Clear();
 
             var response = await _httpClient.GetAsync(url);
             if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Geocoding failed for address: {Address} with status code: {StatusCode}", address, response.StatusCode);
                 throw new Exception($"Geocoding failed for address: {address}");
+            }
 
             var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
             
             var features = doc.RootElement.GetProperty("features");
             if (features.GetArrayLength() == 0) 
+            {
+                _logger.LogWarning("Geocoding location not found for address: {Address}", address);
                 throw new Exception($"Ort nicht gefunden: {address}");
+            }
             
             var coords = features[0].GetProperty("geometry").GetProperty("coordinates");
             

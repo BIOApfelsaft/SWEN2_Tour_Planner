@@ -10,26 +10,35 @@ using System.Security.Cryptography;
 
 namespace TourPlannerAPI.Services
 {
-    public class AuthService(AppDbContext db, IConfiguration config, IMemoryCache cache) : IAuthService
+    public class AuthService(ILogger<AuthService> logger, AppDbContext db, IConfiguration config, IMemoryCache cache) : IAuthService
     {
+        private readonly ILogger<AuthService> _logger = logger;
         private readonly AppDbContext _db = db;
         private readonly IConfiguration _config = config;
         private readonly IMemoryCache _cache = cache;
 
         public async Task<bool> RegisterAsync(User user, string rawPassword)
         {
+            _logger.LogInformation("Attempting to register user: {Username}", user.Username);
+
             // Check if either the Username OR the Email already exists in the database
             if (await _db.Users.AnyAsync(u => u.Username == user.Username || u.Email == user.Email))
+            {
+                _logger.LogWarning("Registration failed. Username '{Username}' or Email '{Email}' already exists.", user.Username, user.Email);
                 return false;
+            }
     
             user.PasswordHash = ComputeSha256(rawPassword);
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
+            
+            _logger.LogInformation("Successfully registered user: {Username}", user.Username);
             return true;
         }
 
         public string GenerateChallenge(string username)
         {
+            _logger.LogInformation("Generating auth challenge for user: {Username}", username);
             var challenge = Guid.NewGuid().ToString("N");
             
             // Save challenge in cache with 2 minutes expiration time
@@ -40,18 +49,31 @@ namespace TourPlannerAPI.Services
 
         public async Task<string?> LoginWithChallengeAsync(string username, string clientResponse)
         {
+            _logger.LogInformation("Login attempt for user: {Username}", username);
+
             if (!_cache.TryGetValue(username, out string? activeChallenge))
+            {
+                _logger.LogWarning("Login failed. No active challenge found for user: {Username} (Challenge may have expired)", username);
                 return null;
+            }
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user == null) return null;
+            if (user == null) 
+            {
+                _logger.LogWarning("Login failed. User not found: {Username}", username);
+                return null;
+            }
 
             var expectedResponse = ComputeSha256(user.PasswordHash + activeChallenge);
-
             _cache.Remove(username);
-            if (expectedResponse != clientResponse)
-                return null;
 
+            if (expectedResponse != clientResponse)
+            {
+                _logger.LogWarning("Login failed. Invalid challenge response for user: {Username}", username);
+                return null;
+            }
+
+            _logger.LogInformation("Login successful for user: {Username}", username);
             return GenerateToken(user);
         }
 
