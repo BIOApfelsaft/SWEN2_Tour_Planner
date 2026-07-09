@@ -3,11 +3,13 @@ using System.Security.Claims;
 using TourPlannerAPI.DTOs.ImportExport;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TourPlannerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ImportExportController(IImportExportService importExportService) : ControllerBase
     {
         private readonly IImportExportService _importExportService = importExportService;

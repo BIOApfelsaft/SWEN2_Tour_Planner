@@ -1,4 +1,4 @@
-using TourPlannerAPI.Models.Search;
+using TourPlannerAPI.Models;
 
 namespace TourPlannerAPI.Services
 {

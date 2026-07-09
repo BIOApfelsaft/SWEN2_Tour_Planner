@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TourPlannerAPI.Data;
-using TourPlannerAPI.Models.Search;
+using TourPlannerAPI.Models;
 
 namespace TourPlannerAPI.Repositories
 {

@@ -1,8 +1,8 @@
-using TourPlannerAPI.DTOs.Weather;
+using TourPlannerAPI.Models;
 
 namespace TourPlannerAPI.Services;
 
 public interface IWeatherService
 {
-    Task<WeatherResponse> GetWeatherAsync(string location);
+    Task<Weather> GetWeatherAsync(string location);
 }

@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TourPlannerAPI.DTOs.Stats;
 using TourPlannerAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TourPlannerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class StatsController(IStatsService statsService) : ControllerBase
     {
         private readonly IStatsService _statsService = statsService;

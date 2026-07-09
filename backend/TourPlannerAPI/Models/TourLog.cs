@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace TourPlannerAPI.Models;
 
-namespace TourPlannerAPI.Models;
-
-public partial class TourLog
+public class TourLog
 {
     public int Id { get; set; }
 

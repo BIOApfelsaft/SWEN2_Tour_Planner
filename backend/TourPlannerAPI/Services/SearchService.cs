@@ -1,5 +1,4 @@
-// SearchService.cs
-using TourPlannerAPI.Models.Search;
+using TourPlannerAPI.Models;
 using TourPlannerAPI.Repositories;
 
 namespace TourPlannerAPI.Services
