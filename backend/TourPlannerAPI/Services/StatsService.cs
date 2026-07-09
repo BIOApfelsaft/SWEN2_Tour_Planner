@@ -3,12 +3,15 @@ using TourPlannerAPI.Repositories;
 
 namespace TourPlannerAPI.Services
 {
-    public class StatsService(IStatsRepository statsRepository) : IStatsService
+    public class StatsService(ILogger<StatsService> logger, IStatsRepository statsRepository) : IStatsService
     {
+        private readonly ILogger<StatsService> _logger = logger;
         private readonly IStatsRepository _statsRepository = statsRepository;
 
         public async Task<List<StatItemModel>> GetFunFactsAsync(int userId)
         {
+            _logger.LogInformation("Generating fun facts statistics for user ID: {UserId}", userId);
+            
             var data = await _statsRepository.GetUserStatsAsync(userId);
             var result = new List<StatItemModel>();
 

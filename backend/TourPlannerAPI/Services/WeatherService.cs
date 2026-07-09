@@ -4,13 +4,16 @@ using TourPlannerAPI.Models;
 
 namespace TourPlannerAPI.Services;
 
-public class WeatherService(HttpClient httpClient, IOpenRouteService openRouteService) : IWeatherService
+public class WeatherService(ILogger<WeatherService> logger, HttpClient httpClient, IOpenRouteService openRouteService) : IWeatherService
 {
+    private readonly ILogger<WeatherService> _logger = logger;
     private readonly HttpClient _httpClient = httpClient;
     private readonly IOpenRouteService _openRouteService = openRouteService;
 
     public async Task<Weather> GetWeatherAsync(string location)
     {
+        _logger.LogInformation("Fetching weather data for location: {Location}", location);
+        
         var (lng, lat) = await _openRouteService.GetCoordinatesAsync(location);
 
         string latStr = lat.ToString(CultureInfo.InvariantCulture);
@@ -23,6 +26,7 @@ public class WeatherService(HttpClient httpClient, IOpenRouteService openRouteSe
         if (!response.IsSuccessStatusCode)
         {
             var errorBody = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Open-Meteo API failed with status {StatusCode}: {ErrorBody}", response.StatusCode, errorBody);
             throw new Exception($"Open-Meteo API failed with {response.StatusCode}: {errorBody}");
         }
 
