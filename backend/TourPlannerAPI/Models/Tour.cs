@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using TourPlannerAPI.Models;
+﻿namespace TourPlannerAPI.Models;
 
-namespace TourPlannerAPI.Models;
-
-public partial class Tour
+public class Tour
 {
     public int Id { get; set; }
 
@@ -36,7 +32,7 @@ public partial class Tour
 
     public DateTime UpdatedAt { get; set; }
 
-    public virtual ICollection<TourLog> TourLogs { get; set; } = new List<TourLog>();
+    public virtual ICollection<TourLog> TourLogs { get; set; } = [];
 
     public virtual User User { get; set; } = null!;
 }

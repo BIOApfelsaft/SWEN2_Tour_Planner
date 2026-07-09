@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
-using TourPlannerAPI.DTOs.Weather;
+using TourPlannerAPI.Models;
 
 namespace TourPlannerAPI.Services;
 
@@ -9,7 +9,7 @@ public class WeatherService(HttpClient httpClient, IOpenRouteService openRouteSe
     private readonly HttpClient _httpClient = httpClient;
     private readonly IOpenRouteService _openRouteService = openRouteService;
 
-    public async Task<WeatherResponse> GetWeatherAsync(string location)
+    public async Task<Weather> GetWeatherAsync(string location)
     {
         var (lng, lat) = await _openRouteService.GetCoordinatesAsync(location);
 
@@ -35,7 +35,7 @@ public class WeatherService(HttpClient httpClient, IOpenRouteService openRouteSe
 
         var (condition, icon) = MapWeatherCode(code);
 
-        return new WeatherResponse
+        return new Weather
         {
             Temperature = temp,
             Condition = condition,

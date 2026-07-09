@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using TourPlannerAPI.DTOs.Search;
-using TourPlannerAPI.Models.Search;
+using TourPlannerAPI.Models;
 using TourPlannerAPI.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TourPlannerAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class SearchController(ISearchService searchService) : ControllerBase
     {
         private readonly ISearchService _searchService = searchService;
