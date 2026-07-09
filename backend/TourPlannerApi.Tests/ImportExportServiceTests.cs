@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.Repositories;

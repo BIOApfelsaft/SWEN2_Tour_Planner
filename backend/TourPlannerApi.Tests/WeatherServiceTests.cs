@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TourPlannerAPI.Services;
+using Microsoft.Extensions.Logging;
 
 namespace TourPlannerAPI.Tests.Services;
 
@@ -13,11 +14,13 @@ namespace TourPlannerAPI.Tests.Services;
 public class WeatherServiceTests
 {
     private Mock<IOpenRouteService> _mockOrsClient;
+    private Mock<ILogger<WeatherService>> _mockLogger;
 
     [SetUp]
     public void Setup()
     {
         _mockOrsClient = new Mock<IOpenRouteService>();
+        _mockLogger = new Mock<ILogger<WeatherService>>();
     }
 
     [Test]
@@ -56,8 +59,8 @@ public class WeatherServiceTests
         // Tell the mock ORS to return coordinates when asked for "Vienna"
         _mockOrsClient.Setup(o => o.GetCoordinatesAsync("Vienna")).ReturnsAsync((16.37, 48.20));
 
-        // Inject the ORS mock into your WeatherService
-        var weatherService = new WeatherService(httpClient, _mockOrsClient.Object);
+        // Inject the ORS mock and Logger into your WeatherService
+        var weatherService = new WeatherService(_mockLogger.Object, httpClient, _mockOrsClient.Object);
 
         // Act: Pass a single string argument (the city name)
         var result = await weatherService.GetWeatherAsync("Vienna");
@@ -103,7 +106,7 @@ public class WeatherServiceTests
 
         _mockOrsClient.Setup(o => o.GetCoordinatesAsync("Vienna")).ReturnsAsync((16.37, 48.20));
 
-        var weatherService = new WeatherService(httpClient, _mockOrsClient.Object);
+        var weatherService = new WeatherService(_mockLogger.Object, httpClient, _mockOrsClient.Object);
 
         // Act
         var result = await weatherService.GetWeatherAsync("Vienna");
