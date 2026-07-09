@@ -1,7 +1,8 @@
 using Moq;
 using NUnit.Framework;
-using TourPlannerAPI.Models.Search;
+using TourPlannerAPI.Models;
 using TourPlannerAPI.Repositories;
+using Microsoft.Extensions.Logging;
 using TourPlannerAPI.Services;
 
 namespace TourPlannerAPI.Tests.Services;
@@ -10,13 +11,16 @@ namespace TourPlannerAPI.Tests.Services;
 public class SearchServiceTests
 {
     private Mock<ISearchRepository> _mockRepository;
+    private Mock<ILogger<SearchService>> _mockLogger;
     private SearchService _searchService;
 
     [SetUp]
     public void Setup()
     {
         _mockRepository = new Mock<ISearchRepository>();
-        _searchService = new SearchService(_mockRepository.Object);
+        _mockLogger = new Mock<ILogger<SearchService>>();
+        
+        _searchService = new SearchService(_mockLogger.Object, _mockRepository.Object);
     }
 
     [TestCase(null)]

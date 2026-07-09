@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using TourPlannerAPI.Data;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.Services;
@@ -15,6 +16,7 @@ public class AuthServiceTests
     private AppDbContext _dbContext;
     private IMemoryCache _cache;
     private Mock<IConfiguration> _mockConfig;
+    private Mock<ILogger<AuthService>> _mockLogger;
     private AuthService _authService;
 
     [SetUp]
@@ -37,8 +39,11 @@ public class AuthServiceTests
         _mockConfig.Setup(c => c["Jwt:Audience"]).Returns("TestAudience");
         _mockConfig.Setup(c => c["Jwt:ExpiryMinutes"]).Returns("60");
 
-        // 4. Instantiate the service
-        _authService = new AuthService(_dbContext, _mockConfig.Object, _cache);
+        // 4. Mock Logger
+        _mockLogger = new Mock<ILogger<AuthService>>();
+
+        // 5. Instantiate the service
+        _authService = new AuthService(_mockLogger.Object, _dbContext, _mockConfig.Object, _cache);
     }
 
     [TearDown]

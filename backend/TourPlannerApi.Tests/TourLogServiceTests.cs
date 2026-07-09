@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.Repositories;
 using TourPlannerAPI.Services;

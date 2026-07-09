@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TourPlannerAPI.Models;
 using TourPlannerAPI.Repositories;
 using TourPlannerAPI.Services;

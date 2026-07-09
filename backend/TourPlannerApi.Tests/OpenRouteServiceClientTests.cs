@@ -59,7 +59,7 @@ public class OpenRouteServiceClientTests
             .Verifiable();
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var clientService = new OpenRouteServiceClient(httpClient, _mockConfig.Object);
+        var clientService = new OpenRouteServiceClient(_mockLogger.Object, httpClient, _mockConfig.Object);
 
         // Act
         var (distanceKm, timeSeconds, geoJson) = await clientService.GetRouteDataAsync(10, 20, 30, 40, "car");
